@@ -1,0 +1,17 @@
+def _main_(): returns int
+var
+    type int:x:5;
+    type int:y:6;
+begin
+  def foo():
+    begin
+    end
+    x = 5;
+    return 6;
+    begin
+      def foo():
+      begin
+      end
+    end
+end
+
