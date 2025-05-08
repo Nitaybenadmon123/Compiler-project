@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "symbol_table.h"
 #include "ast.h"
 
@@ -8,9 +9,9 @@ SymbolTable* symbol_stack[MAX_SCOPE_DEPTH];
 int current_scope = -1;
 int max_scope = -1;
 int preserve_symbol_tables = 0;  
+
+// הכרזה על פונקציה שמוגדרת בקוד אחר
 void yyerror(const char* s);
-
-
 
 void enter_scope() {
     current_scope++;
@@ -21,8 +22,6 @@ void enter_scope() {
     symbol_stack[current_scope]->head = NULL;
     printf("create new scope current_scope is: %d\n", current_scope);
 }
-
-
 
 void exit_scope() {
     /*if (!preserve_symbol_tables) {
@@ -37,18 +36,15 @@ void exit_scope() {
     current_scope--;
 }
 
-
 void insert_symbol(char* name, SymbolKind kind, DataType type) {
     Symbol* new_sym = malloc(sizeof(Symbol));
     new_sym->name = strdup(name);
     new_sym->kind = kind;
     new_sym->type = type;
+    new_sym->param_count = 0; // ברירת מחדל
     new_sym->next = symbol_stack[current_scope]->head;
     symbol_stack[current_scope]->head = new_sym;
-    
-
 }
-
 
 int symbol_exists_in_current_scope(const char* name) {
     Symbol* s = symbol_stack[current_scope]->head;
@@ -59,7 +55,6 @@ int symbol_exists_in_current_scope(const char* name) {
     }
     return 0;
 }
-
 
 Symbol* lookup_symbol(const char* name) {
     for (int i = current_scope; i >= 0; i--) {
@@ -73,7 +68,6 @@ Symbol* lookup_symbol(const char* name) {
     return NULL;
 }
 
-
 DataType get_type_from_name(const char* type_str) {
     if (strcmp(type_str, "int") == 0) return DT_INT;
     if (strcmp(type_str, "real") == 0) return DT_REAL;
@@ -86,6 +80,7 @@ DataType get_type_from_name(const char* type_str) {
     if (strcmp(type_str, "real*") == 0) return DT_PTR_REAL;
     return DT_INT; // ברירת מחדל
 }
+
 const char* get_name_from_type(DataType type) {
     switch (type) {
         case DT_INT: return "int";
@@ -100,7 +95,6 @@ const char* get_name_from_type(DataType type) {
         default: return "unknown";
     }
 }
-
 
 Symbol* lookup_any_scope(const char* name) {
     for (int i = current_scope; i >= 0; i--) {
@@ -121,6 +115,7 @@ void print_scope_hierarchy() {
     }
     printf("------------------------------\n");
 }
+
 void print_symbol_tables() {
     printf("\n===== SYMBOL TABLES (with empty scopes) =====\n");
     for (int i = 0; i <= max_scope; i++) {
@@ -139,6 +134,7 @@ void print_symbol_tables() {
     }
     printf("=======================================\n");
 }
+
 void insert_checked_variable(const char* name, DataType type) {
     if (symbol_exists_in_current_scope(name)) {
         char error_msg[100];
@@ -149,6 +145,7 @@ void insert_checked_variable(const char* name, DataType type) {
         printf("  Inserted '%s' as var in scope %d\n", name, current_scope);
     }
 }
+
 void insert_function_symbol(char* name, DataType type, int param_count) {
     Symbol* new_sym = malloc(sizeof(Symbol));
     new_sym->name = strdup(name);
@@ -238,6 +235,7 @@ void insert_function_with_param_types(char* name, DataType type, int param_count
 }
 
 // פונקציה לאיסוף טיפוסי פרמטרים מהגדרת פונקציה
+// This function should be corrected to properly parse the parameters from the AST
 void collect_param_types(AST* par_list, DataType* param_types) {
     if (!par_list || strcmp(par_list->name, "ARGS") != 0 || par_list->child_count == 0)
         return;
@@ -246,100 +244,86 @@ void collect_param_types(AST* par_list, DataType* param_types) {
     if (!param_list || strcmp(param_list->name, "NONE") == 0)
         return;
     
-    // המבנה: par_list -> param_list_item_list -> par_list_item
-    // par_list_item: ID type COLON ID
-    // בכל par_list_item, הטיפוס הוא במיקום 1 (הילד השני)
-    
     int param_index = 0;
-    collect_param_types_recursive(param_list, param_types, &param_index);
-}
-
-void collect_param_types_recursive(AST* node, DataType* param_types, int* index) {
-    if (!node) return;
     
-    // אם זה צומת par_list_item
-    if (node->child_count >= 2) {
-        // הילד השני הוא טיפוס
-        AST* type_node = node->children[1];
-        if (type_node) {
-            param_types[(*index)++] = get_type_from_name(type_node->name);
+    // Your code might be treating the parameters in incorrect order
+    for (int i = 0; i < param_list->child_count; i++) {
+        AST* param_item = param_list->children[i];
+        if (param_item && param_item->child_count >= 2) {
+            // Extract the type node (should be at index 1)
+            AST* type_node = param_item->children[1];
+            if (type_node) {
+                param_types[param_index++] = get_type_from_name(type_node->name);
+                // Add debug print
+                printf("DEBUG: Collected parameter type %s at index %d\n", 
+                       type_node->name, param_index-1);
+            }
         }
     }
-    
-    // רקורסיה לילדים אחרים, אם יש
-    if (node->child_count > 0 && strcmp(node->name, "") == 0) {
-        // רקורסיה לילד הראשון, אם זהו המשך רשימת פרמטרים
-        collect_param_types_recursive(node->children[0], param_types, index);
+}
+
+// פונקציית עזר לאיסוף טיפוסי פרמטרים ברקורסיה
+void collect_params_recursive(AST* node, DataType* param_types, int* index) {
+    if (!node || node->child_count < 2)
+        return;
+
+    // אם הצומת הוא המשך רשימה
+    if (strcmp(node->name, "") == 0 && node->child_count >= 2) {
+        // קודם מטפלים בפרמטר הנוכחי
+        if (node->children[1] && node->children[1]->child_count >= 2) {
+            DataType type = get_type_from_name(node->children[1]->children[1]->name);
+            param_types[(*index)++] = type;
+            printf("DEBUG: Collected parameter type %s at index %d\n", 
+                  get_name_from_type(type), *index - 1);
+        }
+        
+        // אחר כך מטפלים בשאר הרשימה
+        if (node->children[0]) {
+            collect_params_recursive(node->children[0], param_types, index);
+        }
+    } else if (node->child_count == 3) {
+        // אם זה פרמטר ישיר (למשל הפרמטר האחרון)
+        DataType type = get_type_from_name(node->children[1]->name);
+        param_types[(*index)++] = type;
+        printf("DEBUG: Collected parameter type %s at index %d\n", 
+              get_name_from_type(type), *index - 1);
     }
 }
 
 // פונקציה לקבלת טיפוס של ביטוי
+
 DataType get_expr_type(AST* expr) {
     if (!expr)
         return DT_VOID;
     
-    // אם אין ילדים, זהו ערך או משתנה
-    if (expr->child_count == 0) {
-        // מספרים
-        if (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1])))
-            return DT_INT;
-        
-        // תווים
-        if (expr->name[0] == '\'')
-            return DT_CHAR;
-        
-        // מחרוזות
-        if (expr->name[0] == '"')
-            return DT_STRING;
-        
-        // ערכים בוליאניים
-        if (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0)
-            return DT_BOOL;
-        
-        // מצביע ריק
-        if (strcmp(expr->name, "nullptr") == 0)
-            return DT_PTR_INT;  // או כל טיפוס מצביע אחר
-        
-        // משתנה
-        Symbol* sym = lookup_any_scope(expr->name);
-        if (sym)
-            return sym->type;
-        
-        return DT_INT;  // ברירת מחדל
-    }
+    // If it's a character literal (starts with single quote)
+    if (expr->name[0] == '\'')
+        return DT_CHAR;
     
-    // ביטויים בינאריים
-    if (expr->child_count == 2) {
-        // ביטויים אריתמטיים
-        if (strcmp(expr->name, "+") == 0 || strcmp(expr->name, "-") == 0 ||
-            strcmp(expr->name, "*") == 0 || strcmp(expr->name, "/") == 0) {
-            DataType type1 = get_expr_type(expr->children[0]);
-            DataType type2 = get_expr_type(expr->children[1]);
-            
-            // כללים פשוטים: real עדיף על int
-            if (type1 == DT_REAL || type2 == DT_REAL)
-                return DT_REAL;
-            return DT_INT;
-        }
-        
-        // ביטויי השוואה
-        if (strcmp(expr->name, "==") == 0 || strcmp(expr->name, "!=") == 0 ||
-            strcmp(expr->name, "<") == 0 || strcmp(expr->name, ">") == 0 ||
-            strcmp(expr->name, "<=") == 0 || strcmp(expr->name, ">=") == 0) {
-            return DT_BOOL;
-        }
-    }
+    // If it's a string literal (starts with double quote)
+    if (expr->name[0] == '"')
+        return DT_STRING;
     
-    // קריאות לפונקציות
-    if (strcmp(expr->name, "call") == 0 && expr->child_count >= 1) {
-        Symbol* func = lookup_any_scope(expr->children[0]->name);
-        if (func && func->kind == FUNC_SYM)
-            return func->type;
-    }
+    // If it's a number
+    if (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1])))
+        return DT_INT;
     
-    return DT_INT;  // ברירת מחדל
+    // If it's a boolean literal
+    if (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0)
+        return DT_BOOL;
+    
+    // If it's a NULL pointer
+    if (strcmp(expr->name, "nullptr") == 0)
+        return DT_PTR_INT;  // or any pointer type
+    
+    // If it's a variable, look it up in the symbol table
+    Symbol* sym = lookup_any_scope(expr->name);
+    if (sym)
+        return sym->type;
+    
+    // Default to INT if we can't determine the type
+    return DT_INT;
 }
-
 // פונקציה לבדיקת התאמת טיפוסי פרמטרים
 void check_param_types(char* func_name, AST* args_node) {
     Symbol* func = lookup_any_scope(func_name);
@@ -350,16 +334,24 @@ void check_param_types(char* func_name, AST* args_node) {
     if (param_count == 0)
         return;
     
-    // בדיקת הפרמטרים
+    // Get actual parameter types
     DataType actual_types[MAX_PARAMS];
     memset(actual_types, 0, sizeof(actual_types));
     
-    get_call_param_types(args_node, actual_types);
-    
+    printf("DEBUG: Checking params for function '%s', expects %d params\n", func_name, param_count);
+for (int i = 0; i < param_count; i++) {
+    printf("DEBUG: Formal param %d: %s\n", i+1, get_name_from_type(func->param_types[i]));
+}
+
+get_call_param_types(args_node, actual_types);
+
+printf("DEBUG: Found %d actual params\n", count_actual_params(args_node));
+for (int i = 0; i < param_count; i++) {
+    printf("DEBUG: Actual param %d: %s\n", i+1, get_name_from_type(actual_types[i]));
+}    
     for (int i = 0; i < param_count; i++) {
         if (actual_types[i] != func->param_types[i]) {
-            // אפשר להוסיף כאן המרות אוטומטיות מסוימות (למשל int ל-real)
-            // לדוגמה:
+            // Allow certain implicit conversions (e.g., int to real)
             if (!(func->param_types[i] == DT_REAL && actual_types[i] == DT_INT)) {
                 char msg[200];
                 sprintf(msg, "Semantic Error: Parameter %d of function '%s' expects type %s, got %s",
@@ -370,7 +362,6 @@ void check_param_types(char* func_name, AST* args_node) {
         }
     }
 }
-
 // איסוף טיפוסי פרמטרים מקריאה לפונקציה
 void get_call_param_types(AST* args_node, DataType* types) {
     if (!args_node || strcmp(args_node->name, "args") != 0 || args_node->child_count == 0)
@@ -380,29 +371,45 @@ void get_call_param_types(AST* args_node, DataType* types) {
     if (!param_node || strcmp(param_node->name, "none") == 0)
         return;
     
-    // לולאה על פרמטרים ורקורסיה
+    // Initialize index
     int index = 0;
+    
+    // Debug the AST structure
+    printf("DEBUG: Analyzing call args structure: %s with %d children\n", 
+           param_node->name, param_node->child_count);
+           
+    // Call recursive function to gather parameter types
     get_call_param_types_recursive(param_node, types, &index);
 }
-
+// פונקציית עזר לאיסוף טיפוסי פרמטרים מקריאה לפונקציה
 void get_call_param_types_recursive(AST* node, DataType* types, int* index) {
     if (!node) return;
     
+    printf("DEBUG: Processing node '%s' with %d children for parameter type extraction\n", 
+           node->name, node->child_count);
+    
     if (strcmp(node->name, "par") == 0) {
-        if (node->child_count >= 1) {
-            // אם יש ילד אחד, זה הפרמטר הראשון והיחיד
-            if (node->child_count == 1) {
-                types[(*index)++] = get_expr_type(node->children[0]);
-            }
-            // אם יש שני ילדים, הראשון הוא המשך הרשימה והשני הוא הפרמטר הנוכחי
-            else if (node->child_count == 2) {
-                get_call_param_types_recursive(node->children[0], types, index);
-                types[(*index)++] = get_expr_type(node->children[1]);
-            }
+        if (node->child_count == 1) {
+            // Single parameter
+            types[(*index)++] = get_expr_type(node->children[0]);
+            printf("DEBUG: Extracted single parameter of type %s\n", 
+                   get_name_from_type(types[(*index)-1]));
+        } 
+        else if (node->child_count == 2) {
+            // Two children - typically (rest_of_params, current_param)
+            // Process the rest of the parameters first (recursively)
+            get_call_param_types_recursive(node->children[0], types, index);
+            
+            // Then process the current parameter
+            types[(*index)++] = get_expr_type(node->children[1]);
+            printf("DEBUG: Extracted parameter of type %s\n", 
+                   get_name_from_type(types[(*index)-1]));
         }
-    }
-    // אם node הוא ביטוי ולא "par", זה פרמטר יחיד
+    } 
     else {
+        // Direct expression node
         types[(*index)++] = get_expr_type(node);
+        printf("DEBUG: Extracted direct parameter of type %s\n", 
+               get_name_from_type(types[(*index)-1]));
     }
 }

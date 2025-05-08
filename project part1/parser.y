@@ -440,8 +440,6 @@ assignment_call:
     }
 ;
 
-
-
 void_call:
     CALL ID LPAREN call_args RPAREN SEMICOLON {
         Symbol* func = lookup_any_scope($2);

@@ -1,4 +1,4 @@
-def foo(par1 char: a; par2 int: b): returns int
+def foo(par1 char: a; par2 char: b): returns int
 begin
     return a + b;
 end
@@ -10,7 +10,7 @@ end
 
 def _main_(): returns int
 begin
-    call foo('b',1);  
-    call goo(1,2);
+    call foo(1,1);  
+    call goo(1,'a');
 end
 
