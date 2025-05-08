@@ -45,7 +45,7 @@
 
 %token COLON SEMICOLON COMMA LPAREN RPAREN LBRACK RBRACK BAR TYPE
 
-%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl block_content
+%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr
 %type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call
 %%
 
@@ -407,37 +407,57 @@ elif_list:
 while_stmt:
     WHILE COLON expr SEMICOLON
     {
-        $$=make_node("while",1,$3);
+        check_boolean_condition($3, "while");
+        $$ = make_node("while", 1, $3);
     }
-    |WHILE  expr COLON block
+    | WHILE expr COLON block
     {
-        $$= make_node("while2",2,$2,$4);
+        check_boolean_condition($2, "while");
+        $$ = make_node("while2", 2, $2, $4);
     }
-    |WHILE  expr COLON stmt
+    | WHILE expr COLON stmt
     {
-        $$= make_node("while2",2,$2,$4);
+        check_boolean_condition($2, "while");
+        $$ = make_node("while2", 2, $2, $4);
     }
-
 ;
 do_while_stmt:
-    DO COLON block while_stmt
-    {
-        $$=make_node("do", 1,$3,make_node("do while",1,$4));
+    DO COLON stmt_list WHILE expr SEMICOLON {
+        check_boolean_condition($5, "do-while");
+        $$ = make_node("do-while", 2, $3, $5);
+    }
+    |
+    DO COLON stmt WHILE expr SEMICOLON {
+        check_boolean_condition($5, "do-while");
+        $$ = make_node("do-while", 2, $3, $5);
+    }
+    |
+    DO COLON block WHILE expr SEMICOLON {
+        check_boolean_condition($5, "do-while");
+        $$ = make_node("do-while", 2, $3, $5);
     }
 ;
 
 for_stmt:
-    FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON stmt
-    {
-        $$=make_node("for", 4,$3,$4,$6,$9);
+    FOR LPAREN assignment expr SEMICOLON update_expr RPAREN COLON block {
+        check_boolean_condition($4, "for"); // Check the loop condition expression is boolean
+        $$ = make_node("for", 4, $3, $4, $6, $9);
     }
-    |FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON block
-    {
-        $$=make_node("for", 4,$3,$4,$6,$9);
+    |
+    FOR LPAREN assignment expr SEMICOLON update_expr RPAREN COLON stmt {
+        check_boolean_condition($4, "for"); // Check the loop condition expression is boolean
+        $$ = make_node("for", 4, $3, $4, $6, $9);
     }
-
 ;
 
+update_expr:
+    ID ASSIGN expr {
+        $$ = make_node("=", 2, make_node($1, 0), $3);
+    }
+    | expr {
+        $$ = $1;
+    }
+;
 call_args:
     call_list { $$ = make_node("args", 1, $1); }
   | /* empty */ { $$ = make_node("args", 1, make_node("none", 0)); }
