@@ -64,4 +64,7 @@ void check_param_types(char* func_name, AST* args_node);
 void get_call_param_types(AST* args_node, DataType* types);
 void get_call_param_types_recursive(AST* node, DataType* types, int* index);
 
+// Add to symbols_table.h
+void check_return_type(AST* expr, const char* func_name);
+
 #endif // SYMBOL_TABLE_H

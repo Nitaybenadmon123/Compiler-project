@@ -413,3 +413,47 @@ void get_call_param_types_recursive(AST* node, DataType* types, int* index) {
                get_name_from_type(types[(*index)-1]));
     }
 }
+// Add to symbols_table.c
+void check_return_type(AST* expr, const char* func_name) {
+    Symbol* func = lookup_any_scope(func_name);
+    if (!func || func->kind != FUNC_SYM) {
+        printf("DEBUG: Could not find function '%s' for return type check\n", func_name);
+        return;
+    }
+    
+    // Check for void return
+    if (expr && strcmp(expr->name, "NONE") == 0) {
+        if (func->type != DT_VOID) {
+            char msg[200];
+            sprintf(msg, "Semantic Error: Function '%s' must return a value of type %s", 
+                    func_name, get_name_from_type(func->type));
+            yyerror(msg);
+        }
+        return;
+    }
+    
+    // If function returns void but has a return value
+    if (func->type == DT_VOID && expr && strcmp(expr->name, "NONE") != 0) {
+        char msg[200];
+        sprintf(msg, "Semantic Error: Function '%s' has void return type but returns a value", 
+                func_name);
+        yyerror(msg);
+        return;
+    }
+    
+    // Get return expression type
+    DataType expr_type = get_expr_type(expr);
+    printf("DEBUG: Function '%s' returns type %s, expression has type %s\n", 
+            func_name, get_name_from_type(func->type), get_name_from_type(expr_type));
+    
+    // Check type match (allowing int to real conversion)
+    if (expr_type != func->type) {
+        // Allow int to real conversion
+        if (!(func->type == DT_REAL && expr_type == DT_INT)) {
+            char msg[200];
+            sprintf(msg, "Semantic Error: Function '%s' returns type %s but return statement has type %s", 
+                    func_name, get_name_from_type(func->type), get_name_from_type(expr_type));
+            yyerror(msg);
+        }
+    }
+}

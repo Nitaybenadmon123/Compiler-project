@@ -1,6 +1,9 @@
-def foo(par1 char: a; par2 char: b): returns int
+def foo(par1 char: a; par2 char: b): returns char
+var
+    type int:x:5;
+    type int:y:6;
 begin
-    return a + b;
+    return x + y;
 end
 
 def goo(par1 char: a; par2 int: b): returns int

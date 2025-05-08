@@ -17,6 +17,8 @@
     int current_function = 0; 
     int main_defined = 0;  
     extern int preserve_symbol_tables;
+    // Add to your globals in parser.y
+    char current_function_name[256] = "";
 %}
 
 %union {
@@ -70,6 +72,8 @@ function:
             insert_function_with_param_types($2, get_type_from_name($8->name), param_count, param_types);
             printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
+        // In each function declaration rule
+        strcpy(current_function_name, $2);
 
         if (strcmp($2, "_main_") == 0) {
             if (main_defined)
@@ -83,6 +87,10 @@ function:
             if (get_type_from_name($8->name) != DT_VOID)
                 yyerror("Semantic Error: _main_ function cannot return a value");
         }
+        // Add this check in the function declaration rule actions
+        if (get_type_from_name($8->name) == DT_STRING) {
+            yyerror("Semantic Error: Function cannot return string type");
+        }
     } stmt_list {
         inside_main = 0;
         $$ = make_node("FUNCTION", 4,
@@ -90,6 +98,8 @@ function:
              $4,
              make_node("RET", 1, $8),
              make_node("BODY", 1, $10));
+             // At the end of each function rule, after creating the AST node
+current_function_name[0] = '\0';  // Clear the current function name
     }
 
   | DEF ID LPAREN RPAREN COLON RETURNS type {
@@ -102,6 +112,8 @@ function:
             insert_function_with_param_types($2, get_type_from_name($7->name), 0, param_types);
             printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
+        // In each function declaration rule
+        strcpy(current_function_name, $2);
 
         if (strcmp($2, "_main_") == 0) {
             if (main_defined)
@@ -112,6 +124,9 @@ function:
             if (get_type_from_name($7->name) != DT_VOID)
                 yyerror("Semantic Error: _main_ function cannot return a value");
         }
+        if (get_type_from_name($7->name) == DT_STRING) {
+            yyerror("Semantic Error: Function cannot return string type");
+        }
     } stmt_list {
         inside_main = 0;
         $$ = make_node("FUNCTION", 4,
@@ -119,6 +134,8 @@ function:
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, $7),
              make_node("BODY", 1, $9));
+             // At the end of each function rule, after creating the AST node
+current_function_name[0] = '\0';  // Clear the current function name
     }
 
   | DEF ID LPAREN par_list RPAREN COLON {
@@ -133,6 +150,8 @@ function:
             insert_function_with_param_types($2, DT_VOID, param_count, param_types);
             printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
+        // In each function declaration rule
+        strcpy(current_function_name, $2);
 
         if (strcmp($2, "_main_") == 0) {
             if (main_defined)
@@ -150,6 +169,8 @@ function:
              $4,
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $8));
+             // At the end of each function rule, after creating the AST node
+current_function_name[0] = '\0';  // Clear the current function name
     }
 
   | DEF ID LPAREN RPAREN COLON {
@@ -162,6 +183,8 @@ function:
             insert_function_with_param_types($2, DT_VOID, 0, param_types);
             printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
+        // In each function declaration rule
+    strcpy(current_function_name, $2);
 
         if (strcmp($2, "_main_") == 0) {
             if (main_defined)
@@ -176,6 +199,9 @@ function:
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $7));
+
+             // At the end of each function rule, after creating the AST node
+        current_function_name[0] = '\0';  // Clear the current function name
     }
 ;
 
@@ -311,16 +337,25 @@ type_decl:
     }
 ;
 
+// In return_stmt rule
 return_stmt:
     RETURN expr SEMICOLON {
-        printf("DEBUG: Processing return with value. inside_main=%d\n", inside_main);
+        printf("DEBUG: Processing return with value in function '%s'\n", current_function_name);
         if (inside_main) {
             yyerror("Semantic Error: _main_ function cannot return a value");
         }
+        
+        // Check if return type matches function declaration
+        check_return_type($2, current_function_name);
+        
         $$ = make_node("RETURN", 1, $2);
     }
   | RETURN SEMICOLON {
-        printf("DEBUG: Processing empty return. inside_main=%d\n", inside_main);
+        printf("DEBUG: Processing empty return in function '%s'\n", current_function_name);
+        
+        // Empty return is equivalent to "return void"
+        check_return_type(make_node("NONE", 0), current_function_name);
+        
         $$ = make_node("RETURN", 1, make_node("NONE", 0));
     }
 ;
