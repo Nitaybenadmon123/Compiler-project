@@ -26,30 +26,33 @@ Rules useless in parser due to conflicts
 
 State 9 conflicts: 1 shift/reduce
 State 29 conflicts: 21 shift/reduce
-State 34 conflicts: 1 shift/reduce
-State 40 conflicts: 1 reduce/reduce
+State 36 conflicts: 10 shift/reduce
+State 37 conflicts: 1 shift/reduce
+State 43 conflicts: 1 reduce/reduce
 State 54 conflicts: 1 shift/reduce
 State 55 conflicts: 21 shift/reduce, 24 reduce/reduce
+State 69 conflicts: 2 shift/reduce
 State 71 conflicts: 21 shift/reduce
 State 72 conflicts: 21 shift/reduce
-State 75 conflicts: 21 shift/reduce
-State 77 conflicts: 1 shift/reduce
-State 88 conflicts: 21 shift/reduce
-State 105 conflicts: 21 shift/reduce, 24 reduce/reduce
-State 106 conflicts: 21 shift/reduce, 24 reduce/reduce
-State 110 conflicts: 22 shift/reduce
-State 113 conflicts: 21 shift/reduce
-State 115 conflicts: 21 shift/reduce
-State 128 conflicts: 24 reduce/reduce
-State 142 conflicts: 21 shift/reduce
-State 148 conflicts: 1 shift/reduce
-State 149 conflicts: 1 shift/reduce, 24 reduce/reduce
-State 152 conflicts: 24 reduce/reduce
-State 162 conflicts: 21 shift/reduce, 24 reduce/reduce
-State 178 conflicts: 21 shift/reduce
-State 194 conflicts: 1 shift/reduce
-State 210 conflicts: 21 shift/reduce
-State 218 conflicts: 24 reduce/reduce
+State 73 conflicts: 1 shift/reduce
+State 78 conflicts: 21 shift/reduce
+State 89 conflicts: 21 shift/reduce
+State 108 conflicts: 21 shift/reduce, 24 reduce/reduce
+State 109 conflicts: 21 shift/reduce, 24 reduce/reduce
+State 114 conflicts: 22 shift/reduce
+State 116 conflicts: 21 shift/reduce
+State 118 conflicts: 21 shift/reduce
+State 131 conflicts: 24 reduce/reduce
+State 134 conflicts: 2 shift/reduce
+State 147 conflicts: 21 shift/reduce
+State 153 conflicts: 1 shift/reduce
+State 154 conflicts: 1 shift/reduce, 24 reduce/reduce
+State 157 conflicts: 24 reduce/reduce
+State 167 conflicts: 21 shift/reduce, 24 reduce/reduce
+State 183 conflicts: 21 shift/reduce
+State 199 conflicts: 1 shift/reduce
+State 215 conflicts: 21 shift/reduce
+State 223 conflicts: 24 reduce/reduce
 
 
 Grammar
@@ -193,54 +196,57 @@ Grammar
   101     | NOT
   102     | CALL ID LPAREN call_args RPAREN
   103     | ID LPAREN call_args RPAREN
+  104     | expr AND expr
+  105     | expr OR expr
+  106     | NOT expr
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256) 2
-    ID <sval> (258) 6 8 10 12 17 40 45 46 47 48 49 50 51 52 53 54 74 75 93 102 103
-    CHAR_LITERAL <sval> (259) 51 94
-    STRING_LITERAL <sval> (260) 52 95
-    NUM <sval> (261) 50 92
-    TRUE <sval> (262) 53 97
-    FALSE <sval> (263) 54 98
-    TYPE_INT <sval> (264) 18 45 50
-    TYPE_CHAR <sval> (265) 19 47 51
-    TYPE_REAL <sval> (266) 20 49
-    TYPE_BOOL <sval> (267) 21 46 53 54
-    TYPE_STRING <sval> (268) 22 48 52
-    TYPE_INT_PTR <sval> (269) 23
-    TYPE_CHAR_PTR <sval> (270) 24
-    TYPE_REAL_PTR <sval> (271) 25
-    DEF (272) 6 8 10 12
-    T_BEGIN (273) 77 79
-    T_END (274) 77 79
-    IF (275) 57 58 59 60 61
-    ELSE (276) 57 60 61
-    ELIF (277) 62 63
-    WHILE (278) 64 65 66
-    FOR (279) 68 69
-    DO (280) 67
-    CALL (281) 74 75 102
-    RETURN (282) 55 56
-    RETURNS (283) 6 8
-    VAR (284) 41 42
-    NULLPTR (285) 96
-    AND (286) 99
-    OR (287) 100
-    NOT (288) 101
-    EQ (289) 84
-    NE (290) 85
-    GT (291) 87
-    GE (292) 89
-    LT (293) 86
-    LE (294) 88
-    ASSIGN (295) 40 74
-    PLUS (296) 80
-    MINUS (297) 81
-    MULT (298) 82
-    DIV (299) 83
+    OR (258) 100 105
+    AND (259) 99 104
+    PLUS (260) 80
+    MINUS (261) 81
+    MULT (262) 82
+    DIV (263) 83
+    EQ (264) 84
+    NE (265) 85
+    GT (266) 87
+    GE (267) 89
+    LT (268) 86
+    LE (269) 88
+    NOT (270) 101 106
+    ID <sval> (271) 6 8 10 12 17 40 45 46 47 48 49 50 51 52 53 54 74 75 93 102 103
+    CHAR_LITERAL <sval> (272) 51 94
+    STRING_LITERAL <sval> (273) 52 95
+    NUM <sval> (274) 50 92
+    TRUE <sval> (275) 53 97
+    FALSE <sval> (276) 54 98
+    TYPE_INT <sval> (277) 18 45 50
+    TYPE_CHAR <sval> (278) 19 47 51
+    TYPE_REAL <sval> (279) 20 49
+    TYPE_BOOL <sval> (280) 21 46 53 54
+    TYPE_STRING <sval> (281) 22 48 52
+    TYPE_INT_PTR <sval> (282) 23
+    TYPE_CHAR_PTR <sval> (283) 24
+    TYPE_REAL_PTR <sval> (284) 25
+    DEF (285) 6 8 10 12
+    T_BEGIN (286) 77 79
+    T_END (287) 77 79
+    IF (288) 57 58 59 60 61
+    ELSE (289) 57 60 61
+    ELIF (290) 62 63
+    WHILE (291) 64 65 66
+    FOR (292) 68 69
+    DO (293) 67
+    CALL (294) 74 75 102
+    RETURN (295) 55 56
+    RETURNS (296) 6 8
+    VAR (297) 41 42
+    NULLPTR (298) 96
+    ASSIGN (299) 40 74
     ADDRESS (300)
     COLON (301) 6 8 10 12 17 45 46 47 48 49 50 51 52 53 54 57 58 59 60 61 62 63 64 65 66 67 68 69
     SEMICOLON (302) 15 40 45 46 47 48 49 50 51 52 53 54 55 56 64 68 69 74 75
@@ -348,8 +354,8 @@ Nonterminals, with rules where they appear
         on left: 78
         on right: 79
     expr <ast> (86)
-        on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103
-        on right: 40 55 57 58 59 60 61 62 63 64 65 66 68 69 72 73 80 81 82 83 84 85 86 87 88 89 90 91
+        on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106
+        on right: 40 55 57 58 59 60 61 62 63 64 65 66 68 69 72 73 80 81 82 83 84 85 86 87 88 89 90 91 104 105 106
 
 
 State 0
@@ -616,28 +622,31 @@ State 29
 
    12 function: DEF ID LPAREN RPAREN COLON $@4 • stmt_list
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -654,9 +663,6 @@ State 29
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
@@ -717,54 +723,100 @@ State 33
 
 State 34
 
+  100 expr: OR •
+
+    $default  reduce using rule 100 (expr)
+
+
+State 35
+
+   99 expr: AND •
+
+    $default  reduce using rule 99 (expr)
+
+
+State 36
+
+  101 expr: NOT •
+  106     | NOT • expr
+
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    ID              [reduce using rule 101 (expr)]
+    CHAR_LITERAL    [reduce using rule 101 (expr)]
+    STRING_LITERAL  [reduce using rule 101 (expr)]
+    NUM             [reduce using rule 101 (expr)]
+    TRUE            [reduce using rule 101 (expr)]
+    FALSE           [reduce using rule 101 (expr)]
+    CALL            [reduce using rule 101 (expr)]
+    NULLPTR         [reduce using rule 101 (expr)]
+    LPAREN          [reduce using rule 101 (expr)]
+    LBRACK          [reduce using rule 101 (expr)]
+    $default        reduce using rule 101 (expr)
+
+    expr  go to state 75
+
+
+State 37
+
    40 assignment: ID • ASSIGN expr SEMICOLON
    74 assignment_call: ID • ASSIGN CALL ID LPAREN call_args RPAREN SEMICOLON
    93 expr: ID •
   103     | ID • LPAREN call_args RPAREN
 
-    ASSIGN  shift, and go to state 73
-    LPAREN  shift, and go to state 74
+    ASSIGN  shift, and go to state 76
+    LPAREN  shift, and go to state 77
 
     LPAREN    [reduce using rule 93 (expr)]
     $default  reduce using rule 93 (expr)
 
 
-State 35
+State 38
 
    94 expr: CHAR_LITERAL •
 
     $default  reduce using rule 94 (expr)
 
 
-State 36
+State 39
 
    95 expr: STRING_LITERAL •
 
     $default  reduce using rule 95 (expr)
 
 
-State 37
+State 40
 
    92 expr: NUM •
 
     $default  reduce using rule 92 (expr)
 
 
-State 38
+State 41
 
    97 expr: TRUE •
 
     $default  reduce using rule 97 (expr)
 
 
-State 39
+State 42
 
    98 expr: FALSE •
 
     $default  reduce using rule 98 (expr)
 
 
-State 40
+State 43
 
    77 block: T_BEGIN • $@5 stmt_list T_END
    79      | T_BEGIN • $@6 T_END
@@ -773,11 +825,11 @@ State 40
     T_END     [reduce using rule 78 ($@6)]
     $default  reduce using rule 76 ($@5)
 
-    $@5  go to state 75
-    $@6  go to state 76
+    $@5  go to state 78
+    $@6  go to state 79
 
 
-State 41
+State 44
 
    57 if_stmt: IF • expr COLON block ELSE COLON block
    58        | IF • expr COLON block
@@ -785,172 +837,151 @@ State 41
    60        | IF • expr COLON stmt ELSE COLON stmt
    61        | IF • expr COLON block elif_list ELSE COLON block
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 79
+    expr  go to state 80
 
 
-State 42
+State 45
 
    64 while_stmt: WHILE • COLON expr SEMICOLON
    65           | WHILE • expr COLON block
    66           | WHILE • expr COLON stmt
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    COLON           shift, and go to state 80
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    COLON           shift, and go to state 81
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 81
-
-
-State 43
-
-   68 for_stmt: FOR • LPAREN assignment expr SEMICOLON expr RPAREN COLON stmt
-   69         | FOR • LPAREN assignment expr SEMICOLON expr RPAREN COLON block
-
-    LPAREN  shift, and go to state 82
-
-
-State 44
-
-   67 do_while_stmt: DO • COLON block while_stmt
-
-    COLON  shift, and go to state 83
-
-
-State 45
-
-   75 void_call: CALL • ID LPAREN call_args RPAREN SEMICOLON
-  102 expr: CALL • ID LPAREN call_args RPAREN
-
-    ID  shift, and go to state 84
+    expr  go to state 82
 
 
 State 46
 
-   55 return_stmt: RETURN • expr SEMICOLON
-   56            | RETURN • SEMICOLON
+   68 for_stmt: FOR • LPAREN assignment expr SEMICOLON expr RPAREN COLON stmt
+   69         | FOR • LPAREN assignment expr SEMICOLON expr RPAREN COLON block
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    SEMICOLON       shift, and go to state 85
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 86
+    LPAREN  shift, and go to state 83
 
 
 State 47
 
-   41 var_stmt: VAR • type_decls block
-   42         | VAR • type_decls stmt
+   67 do_while_stmt: DO • COLON block while_stmt
 
-    TYPE  shift, and go to state 87
-
-    type_decls  go to state 88
-    type_decl   go to state 89
+    COLON  shift, and go to state 84
 
 
 State 48
+
+   75 void_call: CALL • ID LPAREN call_args RPAREN SEMICOLON
+  102 expr: CALL • ID LPAREN call_args RPAREN
+
+    ID  shift, and go to state 85
+
+
+State 49
+
+   55 return_stmt: RETURN • expr SEMICOLON
+   56            | RETURN • SEMICOLON
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    SEMICOLON       shift, and go to state 86
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 87
+
+
+State 50
+
+   41 var_stmt: VAR • type_decls block
+   42         | VAR • type_decls stmt
+
+    TYPE  shift, and go to state 88
+
+    type_decls  go to state 89
+    type_decl   go to state 90
+
+
+State 51
 
    96 expr: NULLPTR •
 
     $default  reduce using rule 96 (expr)
 
 
-State 49
-
-   99 expr: AND •
-
-    $default  reduce using rule 99 (expr)
-
-
-State 50
-
-  100 expr: OR •
-
-    $default  reduce using rule 100 (expr)
-
-
-State 51
-
-  101 expr: NOT •
-
-    $default  reduce using rule 101 (expr)
-
-
 State 52
 
    90 expr: LPAREN • expr RPAREN
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 90
+    expr  go to state 91
 
 
 State 53
 
    91 expr: LBRACK • expr RBRACK
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 91
+    expr  go to state 92
 
 
 State 54
@@ -971,30 +1002,36 @@ State 55
    12 function: DEF ID LPAREN RPAREN COLON $@4 stmt_list •
    26 stmt_list: stmt_list • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $end            reduce using rule 12 (function)
     $end            [reduce using rule 71 (call_args)]
+    OR              [reduce using rule 12 (function)]
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 12 (function)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 12 (function)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 12 (function)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 12 (function)]
@@ -1031,12 +1068,6 @@ State 55
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 12 (function)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 12 (function)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 12 (function)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 12 (function)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 12 (function)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 12 (function)]
@@ -1045,7 +1076,7 @@ State 55
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 92
+    stmt             go to state 93
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -1129,7 +1160,7 @@ State 65
    70 call_args: call_list •
    72 call_list: call_list • COMMA expr
 
-    COMMA  shift, and go to state 93
+    COMMA  shift, and go to state 94
 
     $default  reduce using rule 70 (call_args)
 
@@ -1168,18 +1199,24 @@ State 69
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
 
+    OR        [reduce using rule 73 (call_list)]
+    AND       [reduce using rule 73 (call_list)]
     $default  reduce using rule 73 (call_list)
 
 
@@ -1196,35 +1233,38 @@ State 70
     TYPE_CHAR_PTR  shift, and go to state 21
     TYPE_REAL_PTR  shift, and go to state 22
 
-    type  go to state 104
+    type  go to state 107
 
 
 State 71
 
    10 function: DEF ID LPAREN par_list RPAREN COLON $@3 • stmt_list
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -1241,16 +1281,13 @@ State 71
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt_list        go to state 105
+    stmt_list        go to state 108
     stmt             go to state 56
     assignment       go to state 57
     var_stmt         go to state 58
@@ -1271,28 +1308,31 @@ State 72
 
     8 function: DEF ID LPAREN RPAREN COLON RETURNS type $@2 • stmt_list
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -1309,16 +1349,13 @@ State 72
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt_list        go to state 106
+    stmt_list        go to state 109
     stmt             go to state 56
     assignment       go to state 57
     var_stmt         go to state 58
@@ -1337,77 +1374,117 @@ State 72
 
 State 73
 
-   40 assignment: ID ASSIGN • expr SEMICOLON
-   74 assignment_call: ID ASSIGN • CALL ID LPAREN call_args RPAREN SEMICOLON
+   93 expr: ID •
+  103     | ID • LPAREN call_args RPAREN
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 107
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
+    LPAREN  shift, and go to state 77
 
-    expr  go to state 108
+    LPAREN    [reduce using rule 93 (expr)]
+    $default  reduce using rule 93 (expr)
 
 
 State 74
 
+  102 expr: CALL • ID LPAREN call_args RPAREN
+
+    ID  shift, and go to state 110
+
+
+State 75
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+  106     | NOT expr •
+
+    $default  reduce using rule 106 (expr)
+
+
+State 76
+
+   40 assignment: ID ASSIGN • expr SEMICOLON
+   74 assignment_call: ID ASSIGN • CALL ID LPAREN call_args RPAREN SEMICOLON
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 111
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 112
+
+
+State 77
+
   103 expr: ID LPAREN • call_args RPAREN
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $default  reduce using rule 71 (call_args)
 
-    call_args  go to state 109
+    call_args  go to state 113
     call_list  go to state 65
     expr       go to state 69
 
 
-State 75
+State 78
 
    77 block: T_BEGIN $@5 • stmt_list T_END
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -1424,16 +1501,13 @@ State 75
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt_list        go to state 110
+    stmt_list        go to state 114
     stmt             go to state 56
     assignment       go to state 57
     var_stmt         go to state 58
@@ -1450,32 +1524,14 @@ State 75
     expr             go to state 69
 
 
-State 76
+State 79
 
    79 block: T_BEGIN $@6 • T_END
 
-    T_END  shift, and go to state 111
+    T_END  shift, and go to state 115
 
 
-State 77
-
-   93 expr: ID •
-  103     | ID • LPAREN call_args RPAREN
-
-    LPAREN  shift, and go to state 74
-
-    LPAREN    [reduce using rule 93 (expr)]
-    $default  reduce using rule 93 (expr)
-
-
-State 78
-
-  102 expr: CALL • ID LPAREN call_args RPAREN
-
-    ID  shift, and go to state 112
-
-
-State 79
+State 80
 
    57 if_stmt: IF expr • COLON block ELSE COLON block
    58        | IF expr • COLON block
@@ -1492,42 +1548,46 @@ State 79
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
-    COLON  shift, and go to state 113
-
-
-State 80
-
-   64 while_stmt: WHILE COLON • expr SEMICOLON
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 114
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+    COLON  shift, and go to state 116
 
 
 State 81
+
+   64 while_stmt: WHILE COLON • expr SEMICOLON
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 117
+
+
+State 82
 
    65 while_stmt: WHILE expr • COLON block
    66           | WHILE expr • COLON stmt
@@ -1541,55 +1601,59 @@ State 81
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
-    COLON  shift, and go to state 115
-
-
-State 82
-
-   68 for_stmt: FOR LPAREN • assignment expr SEMICOLON expr RPAREN COLON stmt
-   69         | FOR LPAREN • assignment expr SEMICOLON expr RPAREN COLON block
-
-    ID  shift, and go to state 116
-
-    assignment  go to state 117
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+    COLON  shift, and go to state 118
 
 
 State 83
 
-   67 do_while_stmt: DO COLON • block while_stmt
+   68 for_stmt: FOR LPAREN • assignment expr SEMICOLON expr RPAREN COLON stmt
+   69         | FOR LPAREN • assignment expr SEMICOLON expr RPAREN COLON block
 
-    T_BEGIN  shift, and go to state 40
+    ID  shift, and go to state 119
 
-    block  go to state 118
+    assignment  go to state 120
 
 
 State 84
 
-   75 void_call: CALL ID • LPAREN call_args RPAREN SEMICOLON
-  102 expr: CALL ID • LPAREN call_args RPAREN
+   67 do_while_stmt: DO COLON • block while_stmt
 
-    LPAREN  shift, and go to state 119
+    T_BEGIN  shift, and go to state 43
+
+    block  go to state 121
 
 
 State 85
+
+   75 void_call: CALL ID • LPAREN call_args RPAREN SEMICOLON
+  102 expr: CALL ID • LPAREN call_args RPAREN
+
+    LPAREN  shift, and go to state 122
+
+
+State 86
 
    56 return_stmt: RETURN SEMICOLON •
 
     $default  reduce using rule 56 (return_stmt)
 
 
-State 86
+State 87
 
    55 return_stmt: RETURN expr • SEMICOLON
    80 expr: expr • PLUS expr
@@ -1602,21 +1666,25 @@ State 86
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ         shift, and go to state 94
-    NE         shift, and go to state 95
-    GT         shift, and go to state 96
-    GE         shift, and go to state 97
-    LT         shift, and go to state 98
-    LE         shift, and go to state 99
-    PLUS       shift, and go to state 100
-    MINUS      shift, and go to state 101
-    MULT       shift, and go to state 102
-    DIV        shift, and go to state 103
-    SEMICOLON  shift, and go to state 120
+    OR         shift, and go to state 95
+    AND        shift, and go to state 96
+    PLUS       shift, and go to state 97
+    MINUS      shift, and go to state 98
+    MULT       shift, and go to state 99
+    DIV        shift, and go to state 100
+    EQ         shift, and go to state 101
+    NE         shift, and go to state 102
+    GT         shift, and go to state 103
+    GE         shift, and go to state 104
+    LT         shift, and go to state 105
+    LE         shift, and go to state 106
+    SEMICOLON  shift, and go to state 123
 
 
-State 87
+State 88
 
    45 type_decl: TYPE • TYPE_INT COLON ID SEMICOLON
    46          | TYPE • TYPE_BOOL COLON ID SEMICOLON
@@ -1629,42 +1697,45 @@ State 87
    53          | TYPE • TYPE_BOOL COLON ID COLON TRUE SEMICOLON
    54          | TYPE • TYPE_BOOL COLON ID COLON FALSE SEMICOLON
 
-    TYPE_INT     shift, and go to state 121
-    TYPE_CHAR    shift, and go to state 122
-    TYPE_REAL    shift, and go to state 123
-    TYPE_BOOL    shift, and go to state 124
-    TYPE_STRING  shift, and go to state 125
+    TYPE_INT     shift, and go to state 124
+    TYPE_CHAR    shift, and go to state 125
+    TYPE_REAL    shift, and go to state 126
+    TYPE_BOOL    shift, and go to state 127
+    TYPE_STRING  shift, and go to state 128
 
 
-State 88
+State 89
 
    41 var_stmt: VAR type_decls • block
    42         | VAR type_decls • stmt
    43 type_decls: type_decls • type_decl
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
-    TYPE            shift, and go to state 87
+    TYPE            shift, and go to state 88
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -1681,19 +1752,16 @@ State 88
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 126
+    stmt             go to state 129
     assignment       go to state 57
     var_stmt         go to state 58
-    type_decl        go to state 127
+    type_decl        go to state 130
     return_stmt      go to state 59
     if_stmt          go to state 60
     while_stmt       go to state 61
@@ -1703,42 +1771,15 @@ State 88
     call_list        go to state 65
     assignment_call  go to state 66
     void_call        go to state 67
-    block            go to state 128
+    block            go to state 131
     expr             go to state 69
-
-
-State 89
-
-   44 type_decls: type_decl •
-
-    $default  reduce using rule 44 (type_decls)
 
 
 State 90
 
-   80 expr: expr • PLUS expr
-   81     | expr • MINUS expr
-   82     | expr • MULT expr
-   83     | expr • DIV expr
-   84     | expr • EQ expr
-   85     | expr • NE expr
-   86     | expr • LT expr
-   87     | expr • GT expr
-   88     | expr • LE expr
-   89     | expr • GE expr
-   90     | LPAREN expr • RPAREN
+   44 type_decls: type_decl •
 
-    EQ      shift, and go to state 94
-    NE      shift, and go to state 95
-    GT      shift, and go to state 96
-    GE      shift, and go to state 97
-    LT      shift, and go to state 98
-    LE      shift, and go to state 99
-    PLUS    shift, and go to state 100
-    MINUS   shift, and go to state 101
-    MULT    shift, and go to state 102
-    DIV     shift, and go to state 103
-    RPAREN  shift, and go to state 129
+    $default  reduce using rule 44 (type_decls)
 
 
 State 91
@@ -1753,297 +1794,380 @@ State 91
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
-   91     | LBRACK expr • RBRACK
+   90     | LPAREN expr • RPAREN
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ      shift, and go to state 94
-    NE      shift, and go to state 95
-    GT      shift, and go to state 96
-    GE      shift, and go to state 97
-    LT      shift, and go to state 98
-    LE      shift, and go to state 99
-    PLUS    shift, and go to state 100
-    MINUS   shift, and go to state 101
-    MULT    shift, and go to state 102
-    DIV     shift, and go to state 103
-    RBRACK  shift, and go to state 130
+    OR      shift, and go to state 95
+    AND     shift, and go to state 96
+    PLUS    shift, and go to state 97
+    MINUS   shift, and go to state 98
+    MULT    shift, and go to state 99
+    DIV     shift, and go to state 100
+    EQ      shift, and go to state 101
+    NE      shift, and go to state 102
+    GT      shift, and go to state 103
+    GE      shift, and go to state 104
+    LT      shift, and go to state 105
+    LE      shift, and go to state 106
+    RPAREN  shift, and go to state 132
 
 
 State 92
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+   91     | LBRACK expr • RBRACK
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    OR      shift, and go to state 95
+    AND     shift, and go to state 96
+    PLUS    shift, and go to state 97
+    MINUS   shift, and go to state 98
+    MULT    shift, and go to state 99
+    DIV     shift, and go to state 100
+    EQ      shift, and go to state 101
+    NE      shift, and go to state 102
+    GT      shift, and go to state 103
+    GE      shift, and go to state 104
+    LT      shift, and go to state 105
+    LE      shift, and go to state 106
+    RBRACK  shift, and go to state 133
+
+
+State 93
 
    26 stmt_list: stmt_list stmt •
 
     $default  reduce using rule 26 (stmt_list)
 
 
-State 93
+State 94
 
    72 call_list: call_list COMMA • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 131
-
-
-State 94
-
-   84 expr: expr EQ • expr
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 132
-
-
-State 95
-
-   85 expr: expr NE • expr
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 133
-
-
-State 96
-
-   87 expr: expr GT • expr
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 134
 
 
-State 97
+State 95
 
-   89 expr: expr GE • expr
+  105 expr: expr OR • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 135
 
 
-State 98
+State 96
 
-   86 expr: expr LT • expr
+  104 expr: expr AND • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 136
 
 
-State 99
+State 97
 
-   88 expr: expr LE • expr
+   80 expr: expr PLUS • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 137
 
 
-State 100
+State 98
 
-   80 expr: expr PLUS • expr
+   81 expr: expr MINUS • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 138
 
 
-State 101
+State 99
 
-   81 expr: expr MINUS • expr
+   82 expr: expr MULT • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 139
 
 
-State 102
+State 100
 
-   82 expr: expr MULT • expr
+   83 expr: expr DIV • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 140
 
 
-State 103
+State 101
 
-   83 expr: expr DIV • expr
+   84 expr: expr EQ • expr
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     expr  go to state 141
 
 
+State 102
+
+   85 expr: expr NE • expr
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 142
+
+
+State 103
+
+   87 expr: expr GT • expr
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 143
+
+
 State 104
+
+   89 expr: expr GE • expr
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 144
+
+
+State 105
+
+   86 expr: expr LT • expr
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 145
+
+
+State 106
+
+   88 expr: expr LE • expr
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 146
+
+
+State 107
 
     6 function: DEF ID LPAREN par_list RPAREN COLON RETURNS type • $@1 stmt_list
 
     $default  reduce using rule 5 ($@1)
 
-    $@1  go to state 142
+    $@1  go to state 147
 
 
-State 105
+State 108
 
    10 function: DEF ID LPAREN par_list RPAREN COLON $@3 stmt_list •
    26 stmt_list: stmt_list • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $end            reduce using rule 10 (function)
     $end            [reduce using rule 71 (call_args)]
+    OR              [reduce using rule 10 (function)]
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 10 (function)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 10 (function)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 10 (function)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 10 (function)]
@@ -2080,12 +2204,6 @@ State 105
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 10 (function)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 10 (function)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 10 (function)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 10 (function)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 10 (function)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 10 (function)]
@@ -2094,7 +2212,7 @@ State 105
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 92
+    stmt             go to state 93
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -2110,35 +2228,41 @@ State 105
     expr             go to state 69
 
 
-State 106
+State 109
 
     8 function: DEF ID LPAREN RPAREN COLON RETURNS type $@2 stmt_list •
    26 stmt_list: stmt_list • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $end            reduce using rule 8 (function)
     $end            [reduce using rule 71 (call_args)]
+    OR              [reduce using rule 8 (function)]
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 8 (function)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 8 (function)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 8 (function)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 8 (function)]
@@ -2175,12 +2299,6 @@ State 106
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 8 (function)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 8 (function)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 8 (function)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 8 (function)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 8 (function)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 8 (function)]
@@ -2189,7 +2307,7 @@ State 106
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 92
+    stmt             go to state 93
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -2205,15 +2323,22 @@ State 106
     expr             go to state 69
 
 
-State 107
+State 110
+
+  102 expr: CALL ID • LPAREN call_args RPAREN
+
+    LPAREN  shift, and go to state 148
+
+
+State 111
 
    74 assignment_call: ID ASSIGN CALL • ID LPAREN call_args RPAREN SEMICOLON
   102 expr: CALL • ID LPAREN call_args RPAREN
 
-    ID  shift, and go to state 143
+    ID  shift, and go to state 149
 
 
-State 108
+State 112
 
    40 assignment: ID ASSIGN expr • SEMICOLON
    80 expr: expr • PLUS expr
@@ -2226,55 +2351,62 @@ State 108
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ         shift, and go to state 94
-    NE         shift, and go to state 95
-    GT         shift, and go to state 96
-    GE         shift, and go to state 97
-    LT         shift, and go to state 98
-    LE         shift, and go to state 99
-    PLUS       shift, and go to state 100
-    MINUS      shift, and go to state 101
-    MULT       shift, and go to state 102
-    DIV        shift, and go to state 103
-    SEMICOLON  shift, and go to state 144
+    OR         shift, and go to state 95
+    AND        shift, and go to state 96
+    PLUS       shift, and go to state 97
+    MINUS      shift, and go to state 98
+    MULT       shift, and go to state 99
+    DIV        shift, and go to state 100
+    EQ         shift, and go to state 101
+    NE         shift, and go to state 102
+    GT         shift, and go to state 103
+    GE         shift, and go to state 104
+    LT         shift, and go to state 105
+    LE         shift, and go to state 106
+    SEMICOLON  shift, and go to state 150
 
 
-State 109
+State 113
 
   103 expr: ID LPAREN call_args • RPAREN
 
-    RPAREN  shift, and go to state 145
+    RPAREN  shift, and go to state 151
 
 
-State 110
+State 114
 
    26 stmt_list: stmt_list • stmt
    77 block: T_BEGIN $@5 stmt_list • T_END
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    T_END           shift, and go to state 146
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    T_END           shift, and go to state 152
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -2292,15 +2424,12 @@ State 110
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 92
+    stmt             go to state 93
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -2316,21 +2445,14 @@ State 110
     expr             go to state 69
 
 
-State 111
+State 115
 
    79 block: T_BEGIN $@6 T_END •
 
     $default  reduce using rule 79 (block)
 
 
-State 112
-
-  102 expr: CALL ID • LPAREN call_args RPAREN
-
-    LPAREN  shift, and go to state 147
-
-
-State 113
+State 116
 
    57 if_stmt: IF expr COLON • block ELSE COLON block
    58        | IF expr COLON • block
@@ -2338,28 +2460,31 @@ State 113
    60        | IF expr COLON • stmt ELSE COLON stmt
    61        | IF expr COLON • block elif_list ELSE COLON block
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -2376,16 +2501,13 @@ State 113
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 148
+    stmt             go to state 153
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -2397,11 +2519,11 @@ State 113
     call_list        go to state 65
     assignment_call  go to state 66
     void_call        go to state 67
-    block            go to state 149
+    block            go to state 154
     expr             go to state 69
 
 
-State 114
+State 117
 
    64 while_stmt: WHILE COLON expr • SEMICOLON
    80 expr: expr • PLUS expr
@@ -2414,47 +2536,54 @@ State 114
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ         shift, and go to state 94
-    NE         shift, and go to state 95
-    GT         shift, and go to state 96
-    GE         shift, and go to state 97
-    LT         shift, and go to state 98
-    LE         shift, and go to state 99
-    PLUS       shift, and go to state 100
-    MINUS      shift, and go to state 101
-    MULT       shift, and go to state 102
-    DIV        shift, and go to state 103
-    SEMICOLON  shift, and go to state 150
+    OR         shift, and go to state 95
+    AND        shift, and go to state 96
+    PLUS       shift, and go to state 97
+    MINUS      shift, and go to state 98
+    MULT       shift, and go to state 99
+    DIV        shift, and go to state 100
+    EQ         shift, and go to state 101
+    NE         shift, and go to state 102
+    GT         shift, and go to state 103
+    GE         shift, and go to state 104
+    LT         shift, and go to state 105
+    LE         shift, and go to state 106
+    SEMICOLON  shift, and go to state 155
 
 
-State 115
+State 118
 
    65 while_stmt: WHILE expr COLON • block
    66           | WHILE expr COLON • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -2471,16 +2600,13 @@ State 115
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 151
+    stmt             go to state 156
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -2492,142 +2618,148 @@ State 115
     call_list        go to state 65
     assignment_call  go to state 66
     void_call        go to state 67
-    block            go to state 152
+    block            go to state 157
     expr             go to state 69
-
-
-State 116
-
-   40 assignment: ID • ASSIGN expr SEMICOLON
-
-    ASSIGN  shift, and go to state 153
-
-
-State 117
-
-   68 for_stmt: FOR LPAREN assignment • expr SEMICOLON expr RPAREN COLON stmt
-   69         | FOR LPAREN assignment • expr SEMICOLON expr RPAREN COLON block
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 154
-
-
-State 118
-
-   67 do_while_stmt: DO COLON block • while_stmt
-
-    WHILE  shift, and go to state 42
-
-    while_stmt  go to state 155
 
 
 State 119
 
+   40 assignment: ID • ASSIGN expr SEMICOLON
+
+    ASSIGN  shift, and go to state 158
+
+
+State 120
+
+   68 for_stmt: FOR LPAREN assignment • expr SEMICOLON expr RPAREN COLON stmt
+   69         | FOR LPAREN assignment • expr SEMICOLON expr RPAREN COLON block
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 159
+
+
+State 121
+
+   67 do_while_stmt: DO COLON block • while_stmt
+
+    WHILE  shift, and go to state 45
+
+    while_stmt  go to state 160
+
+
+State 122
+
    75 void_call: CALL ID LPAREN • call_args RPAREN SEMICOLON
   102 expr: CALL ID LPAREN • call_args RPAREN
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $default  reduce using rule 71 (call_args)
 
-    call_args  go to state 156
+    call_args  go to state 161
     call_list  go to state 65
     expr       go to state 69
 
 
-State 120
+State 123
 
    55 return_stmt: RETURN expr SEMICOLON •
 
     $default  reduce using rule 55 (return_stmt)
 
 
-State 121
+State 124
 
    45 type_decl: TYPE TYPE_INT • COLON ID SEMICOLON
    50          | TYPE TYPE_INT • COLON ID COLON NUM SEMICOLON
 
-    COLON  shift, and go to state 157
+    COLON  shift, and go to state 162
 
 
-State 122
+State 125
 
    47 type_decl: TYPE TYPE_CHAR • COLON ID SEMICOLON
    51          | TYPE TYPE_CHAR • COLON ID COLON CHAR_LITERAL SEMICOLON
 
-    COLON  shift, and go to state 158
+    COLON  shift, and go to state 163
 
 
-State 123
+State 126
 
    49 type_decl: TYPE TYPE_REAL • COLON ID SEMICOLON
 
-    COLON  shift, and go to state 159
+    COLON  shift, and go to state 164
 
 
-State 124
+State 127
 
    46 type_decl: TYPE TYPE_BOOL • COLON ID SEMICOLON
    53          | TYPE TYPE_BOOL • COLON ID COLON TRUE SEMICOLON
    54          | TYPE TYPE_BOOL • COLON ID COLON FALSE SEMICOLON
 
-    COLON  shift, and go to state 160
+    COLON  shift, and go to state 165
 
 
-State 125
+State 128
 
    48 type_decl: TYPE TYPE_STRING • COLON ID SEMICOLON
    52          | TYPE TYPE_STRING • COLON ID COLON STRING_LITERAL SEMICOLON
 
-    COLON  shift, and go to state 161
+    COLON  shift, and go to state 166
 
 
-State 126
+State 129
 
    42 var_stmt: VAR type_decls stmt •
 
     $default  reduce using rule 42 (var_stmt)
 
 
-State 127
+State 130
 
    43 type_decls: type_decls type_decl •
 
     $default  reduce using rule 43 (type_decls)
 
 
-State 128
+State 131
 
    31 stmt: block •
    41 var_stmt: VAR type_decls block •
 
     $end            reduce using rule 31 (stmt)
     $end            [reduce using rule 41 (var_stmt)]
+    OR              reduce using rule 31 (stmt)
+    OR              [reduce using rule 41 (var_stmt)]
+    AND             reduce using rule 31 (stmt)
+    AND             [reduce using rule 41 (var_stmt)]
+    NOT             reduce using rule 31 (stmt)
+    NOT             [reduce using rule 41 (var_stmt)]
     ID              reduce using rule 31 (stmt)
     ID              [reduce using rule 41 (var_stmt)]
     CHAR_LITERAL    reduce using rule 31 (stmt)
@@ -2664,12 +2796,6 @@ State 128
     VAR             [reduce using rule 41 (var_stmt)]
     NULLPTR         reduce using rule 31 (stmt)
     NULLPTR         [reduce using rule 41 (var_stmt)]
-    AND             reduce using rule 31 (stmt)
-    AND             [reduce using rule 41 (var_stmt)]
-    OR              reduce using rule 31 (stmt)
-    OR              [reduce using rule 41 (var_stmt)]
-    NOT             reduce using rule 31 (stmt)
-    NOT             [reduce using rule 41 (var_stmt)]
     LPAREN          reduce using rule 31 (stmt)
     LPAREN          [reduce using rule 41 (var_stmt)]
     LBRACK          reduce using rule 31 (stmt)
@@ -2677,21 +2803,21 @@ State 128
     $default        reduce using rule 31 (stmt)
 
 
-State 129
+State 132
 
    90 expr: LPAREN expr RPAREN •
 
     $default  reduce using rule 90 (expr)
 
 
-State 130
+State 133
 
    91 expr: LBRACK expr RBRACK •
 
     $default  reduce using rule 91 (expr)
 
 
-State 131
+State 134
 
    72 call_list: call_list COMMA expr •
    80 expr: expr • PLUS expr
@@ -2704,70 +2830,25 @@ State 131
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
 
+    OR        [reduce using rule 72 (call_list)]
+    AND       [reduce using rule 72 (call_list)]
     $default  reduce using rule 72 (call_list)
-
-
-State 132
-
-   80 expr: expr • PLUS expr
-   81     | expr • MINUS expr
-   82     | expr • MULT expr
-   83     | expr • DIV expr
-   84     | expr • EQ expr
-   84     | expr EQ expr •
-   85     | expr • NE expr
-   86     | expr • LT expr
-   87     | expr • GT expr
-   88     | expr • LE expr
-   89     | expr • GE expr
-
-    $default  reduce using rule 84 (expr)
-
-
-State 133
-
-   80 expr: expr • PLUS expr
-   81     | expr • MINUS expr
-   82     | expr • MULT expr
-   83     | expr • DIV expr
-   84     | expr • EQ expr
-   85     | expr • NE expr
-   85     | expr NE expr •
-   86     | expr • LT expr
-   87     | expr • GT expr
-   88     | expr • LE expr
-   89     | expr • GE expr
-
-    $default  reduce using rule 85 (expr)
-
-
-State 134
-
-   80 expr: expr • PLUS expr
-   81     | expr • MINUS expr
-   82     | expr • MULT expr
-   83     | expr • DIV expr
-   84     | expr • EQ expr
-   85     | expr • NE expr
-   86     | expr • LT expr
-   87     | expr • GT expr
-   87     | expr GT expr •
-   88     | expr • LE expr
-   89     | expr • GE expr
-
-    $default  reduce using rule 87 (expr)
 
 
 State 135
@@ -2782,9 +2863,23 @@ State 135
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
-   89     | expr GE expr •
+  104     | expr • AND expr
+  105     | expr • OR expr
+  105     | expr OR expr •
 
-    $default  reduce using rule 89 (expr)
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+
+    $default  reduce using rule 105 (expr)
 
 
 State 136
@@ -2796,32 +2891,28 @@ State 136
    84     | expr • EQ expr
    85     | expr • NE expr
    86     | expr • LT expr
-   86     | expr LT expr •
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  104     | expr AND expr •
+  105     | expr • OR expr
 
-    $default  reduce using rule 86 (expr)
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+
+    $default  reduce using rule 104 (expr)
 
 
 State 137
-
-   80 expr: expr • PLUS expr
-   81     | expr • MINUS expr
-   82     | expr • MULT expr
-   83     | expr • DIV expr
-   84     | expr • EQ expr
-   85     | expr • NE expr
-   86     | expr • LT expr
-   87     | expr • GT expr
-   88     | expr • LE expr
-   88     | expr LE expr •
-   89     | expr • GE expr
-
-    $default  reduce using rule 88 (expr)
-
-
-State 138
 
    80 expr: expr • PLUS expr
    80     | expr PLUS expr •
@@ -2834,20 +2925,22 @@ State 138
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ    shift, and go to state 94
-    NE    shift, and go to state 95
-    GT    shift, and go to state 96
-    GE    shift, and go to state 97
-    LT    shift, and go to state 98
-    LE    shift, and go to state 99
-    MULT  shift, and go to state 102
-    DIV   shift, and go to state 103
+    MULT  shift, and go to state 99
+    DIV   shift, and go to state 100
+    EQ    shift, and go to state 101
+    NE    shift, and go to state 102
+    GT    shift, and go to state 103
+    GE    shift, and go to state 104
+    LT    shift, and go to state 105
+    LE    shift, and go to state 106
 
     $default  reduce using rule 80 (expr)
 
 
-State 139
+State 138
 
    80 expr: expr • PLUS expr
    81     | expr • MINUS expr
@@ -2860,20 +2953,22 @@ State 139
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ    shift, and go to state 94
-    NE    shift, and go to state 95
-    GT    shift, and go to state 96
-    GE    shift, and go to state 97
-    LT    shift, and go to state 98
-    LE    shift, and go to state 99
-    MULT  shift, and go to state 102
-    DIV   shift, and go to state 103
+    MULT  shift, and go to state 99
+    DIV   shift, and go to state 100
+    EQ    shift, and go to state 101
+    NE    shift, and go to state 102
+    GT    shift, and go to state 103
+    GE    shift, and go to state 104
+    LT    shift, and go to state 105
+    LE    shift, and go to state 106
 
     $default  reduce using rule 81 (expr)
 
 
-State 140
+State 139
 
    80 expr: expr • PLUS expr
    81     | expr • MINUS expr
@@ -2886,18 +2981,20 @@ State 140
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ  shift, and go to state 94
-    NE  shift, and go to state 95
-    GT  shift, and go to state 96
-    GE  shift, and go to state 97
-    LT  shift, and go to state 98
-    LE  shift, and go to state 99
+    EQ  shift, and go to state 101
+    NE  shift, and go to state 102
+    GT  shift, and go to state 103
+    GE  shift, and go to state 104
+    LT  shift, and go to state 105
+    LE  shift, and go to state 106
 
     $default  reduce using rule 82 (expr)
 
 
-State 141
+State 140
 
    80 expr: expr • PLUS expr
    81     | expr • MINUS expr
@@ -2910,43 +3007,162 @@ State 141
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ  shift, and go to state 94
-    NE  shift, and go to state 95
-    GT  shift, and go to state 96
-    GE  shift, and go to state 97
-    LT  shift, and go to state 98
-    LE  shift, and go to state 99
+    EQ  shift, and go to state 101
+    NE  shift, and go to state 102
+    GT  shift, and go to state 103
+    GE  shift, and go to state 104
+    LT  shift, and go to state 105
+    LE  shift, and go to state 106
 
     $default  reduce using rule 83 (expr)
 
 
+State 141
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   84     | expr EQ expr •
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 84 (expr)
+
+
 State 142
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   85     | expr NE expr •
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 85 (expr)
+
+
+State 143
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   87     | expr GT expr •
+   88     | expr • LE expr
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 87 (expr)
+
+
+State 144
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+   89     | expr GE expr •
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 89 (expr)
+
+
+State 145
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   86     | expr LT expr •
+   87     | expr • GT expr
+   88     | expr • LE expr
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 86 (expr)
+
+
+State 146
+
+   80 expr: expr • PLUS expr
+   81     | expr • MINUS expr
+   82     | expr • MULT expr
+   83     | expr • DIV expr
+   84     | expr • EQ expr
+   85     | expr • NE expr
+   86     | expr • LT expr
+   87     | expr • GT expr
+   88     | expr • LE expr
+   88     | expr LE expr •
+   89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
+
+    $default  reduce using rule 88 (expr)
+
+
+State 147
 
     6 function: DEF ID LPAREN par_list RPAREN COLON RETURNS type $@1 • stmt_list
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -2963,16 +3179,13 @@ State 142
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt_list        go to state 162
+    stmt_list        go to state 167
     stmt             go to state 56
     assignment       go to state 57
     var_stmt         go to state 58
@@ -2989,83 +3202,89 @@ State 142
     expr             go to state 69
 
 
-State 143
+State 148
+
+  102 expr: CALL ID LPAREN • call_args RPAREN
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    $default  reduce using rule 71 (call_args)
+
+    call_args  go to state 168
+    call_list  go to state 65
+    expr       go to state 69
+
+
+State 149
 
    74 assignment_call: ID ASSIGN CALL ID • LPAREN call_args RPAREN SEMICOLON
   102 expr: CALL ID • LPAREN call_args RPAREN
 
-    LPAREN  shift, and go to state 163
+    LPAREN  shift, and go to state 169
 
 
-State 144
+State 150
 
    40 assignment: ID ASSIGN expr SEMICOLON •
 
     $default  reduce using rule 40 (assignment)
 
 
-State 145
+State 151
 
   103 expr: ID LPAREN call_args RPAREN •
 
     $default  reduce using rule 103 (expr)
 
 
-State 146
+State 152
 
    77 block: T_BEGIN $@5 stmt_list T_END •
 
     $default  reduce using rule 77 (block)
 
 
-State 147
-
-  102 expr: CALL ID LPAREN • call_args RPAREN
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    $default  reduce using rule 71 (call_args)
-
-    call_args  go to state 164
-    call_list  go to state 65
-    expr       go to state 69
-
-
-State 148
+State 153
 
    59 if_stmt: IF expr COLON stmt •
    60        | IF expr COLON stmt • ELSE COLON stmt
 
-    ELSE  shift, and go to state 165
+    ELSE  shift, and go to state 170
 
     ELSE      [reduce using rule 59 (if_stmt)]
     $default  reduce using rule 59 (if_stmt)
 
 
-State 149
+State 154
 
    31 stmt: block •
    57 if_stmt: IF expr COLON block • ELSE COLON block
    58        | IF expr COLON block •
    61        | IF expr COLON block • elif_list ELSE COLON block
 
-    ELSE  shift, and go to state 166
-    ELIF  shift, and go to state 167
+    ELSE  shift, and go to state 171
+    ELIF  shift, and go to state 172
 
     $end            reduce using rule 31 (stmt)
     $end            [reduce using rule 58 (if_stmt)]
+    OR              reduce using rule 31 (stmt)
+    OR              [reduce using rule 58 (if_stmt)]
+    AND             reduce using rule 31 (stmt)
+    AND             [reduce using rule 58 (if_stmt)]
+    NOT             reduce using rule 31 (stmt)
+    NOT             [reduce using rule 58 (if_stmt)]
     ID              reduce using rule 31 (stmt)
     ID              [reduce using rule 58 (if_stmt)]
     CHAR_LITERAL    reduce using rule 31 (stmt)
@@ -3102,42 +3321,42 @@ State 149
     VAR             [reduce using rule 58 (if_stmt)]
     NULLPTR         reduce using rule 31 (stmt)
     NULLPTR         [reduce using rule 58 (if_stmt)]
-    AND             reduce using rule 31 (stmt)
-    AND             [reduce using rule 58 (if_stmt)]
-    OR              reduce using rule 31 (stmt)
-    OR              [reduce using rule 58 (if_stmt)]
-    NOT             reduce using rule 31 (stmt)
-    NOT             [reduce using rule 58 (if_stmt)]
     LPAREN          reduce using rule 31 (stmt)
     LPAREN          [reduce using rule 58 (if_stmt)]
     LBRACK          reduce using rule 31 (stmt)
     LBRACK          [reduce using rule 58 (if_stmt)]
     $default        reduce using rule 31 (stmt)
 
-    elif_list  go to state 168
+    elif_list  go to state 173
 
 
-State 150
+State 155
 
    64 while_stmt: WHILE COLON expr SEMICOLON •
 
     $default  reduce using rule 64 (while_stmt)
 
 
-State 151
+State 156
 
    66 while_stmt: WHILE expr COLON stmt •
 
     $default  reduce using rule 66 (while_stmt)
 
 
-State 152
+State 157
 
    31 stmt: block •
    65 while_stmt: WHILE expr COLON block •
 
     $end            reduce using rule 31 (stmt)
     $end            [reduce using rule 65 (while_stmt)]
+    OR              reduce using rule 31 (stmt)
+    OR              [reduce using rule 65 (while_stmt)]
+    AND             reduce using rule 31 (stmt)
+    AND             [reduce using rule 65 (while_stmt)]
+    NOT             reduce using rule 31 (stmt)
+    NOT             [reduce using rule 65 (while_stmt)]
     ID              reduce using rule 31 (stmt)
     ID              [reduce using rule 65 (while_stmt)]
     CHAR_LITERAL    reduce using rule 31 (stmt)
@@ -3174,12 +3393,6 @@ State 152
     VAR             [reduce using rule 65 (while_stmt)]
     NULLPTR         reduce using rule 31 (stmt)
     NULLPTR         [reduce using rule 65 (while_stmt)]
-    AND             reduce using rule 31 (stmt)
-    AND             [reduce using rule 65 (while_stmt)]
-    OR              reduce using rule 31 (stmt)
-    OR              [reduce using rule 65 (while_stmt)]
-    NOT             reduce using rule 31 (stmt)
-    NOT             [reduce using rule 65 (while_stmt)]
     LPAREN          reduce using rule 31 (stmt)
     LPAREN          [reduce using rule 65 (while_stmt)]
     LBRACK          reduce using rule 31 (stmt)
@@ -3187,28 +3400,28 @@ State 152
     $default        reduce using rule 31 (stmt)
 
 
-State 153
+State 158
 
    40 assignment: ID ASSIGN • expr SEMICOLON
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 108
+    expr  go to state 112
 
 
-State 154
+State 159
 
    68 for_stmt: FOR LPAREN assignment expr • SEMICOLON expr RPAREN COLON stmt
    69         | FOR LPAREN assignment expr • SEMICOLON expr RPAREN COLON block
@@ -3222,104 +3435,114 @@ State 154
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ         shift, and go to state 94
-    NE         shift, and go to state 95
-    GT         shift, and go to state 96
-    GE         shift, and go to state 97
-    LT         shift, and go to state 98
-    LE         shift, and go to state 99
-    PLUS       shift, and go to state 100
-    MINUS      shift, and go to state 101
-    MULT       shift, and go to state 102
-    DIV        shift, and go to state 103
-    SEMICOLON  shift, and go to state 169
+    OR         shift, and go to state 95
+    AND        shift, and go to state 96
+    PLUS       shift, and go to state 97
+    MINUS      shift, and go to state 98
+    MULT       shift, and go to state 99
+    DIV        shift, and go to state 100
+    EQ         shift, and go to state 101
+    NE         shift, and go to state 102
+    GT         shift, and go to state 103
+    GE         shift, and go to state 104
+    LT         shift, and go to state 105
+    LE         shift, and go to state 106
+    SEMICOLON  shift, and go to state 174
 
 
-State 155
+State 160
 
    67 do_while_stmt: DO COLON block while_stmt •
 
     $default  reduce using rule 67 (do_while_stmt)
 
 
-State 156
+State 161
 
    75 void_call: CALL ID LPAREN call_args • RPAREN SEMICOLON
   102 expr: CALL ID LPAREN call_args • RPAREN
 
-    RPAREN  shift, and go to state 170
+    RPAREN  shift, and go to state 175
 
 
-State 157
+State 162
 
    45 type_decl: TYPE TYPE_INT COLON • ID SEMICOLON
    50          | TYPE TYPE_INT COLON • ID COLON NUM SEMICOLON
 
-    ID  shift, and go to state 171
+    ID  shift, and go to state 176
 
 
-State 158
+State 163
 
    47 type_decl: TYPE TYPE_CHAR COLON • ID SEMICOLON
    51          | TYPE TYPE_CHAR COLON • ID COLON CHAR_LITERAL SEMICOLON
 
-    ID  shift, and go to state 172
+    ID  shift, and go to state 177
 
 
-State 159
+State 164
 
    49 type_decl: TYPE TYPE_REAL COLON • ID SEMICOLON
 
-    ID  shift, and go to state 173
+    ID  shift, and go to state 178
 
 
-State 160
+State 165
 
    46 type_decl: TYPE TYPE_BOOL COLON • ID SEMICOLON
    53          | TYPE TYPE_BOOL COLON • ID COLON TRUE SEMICOLON
    54          | TYPE TYPE_BOOL COLON • ID COLON FALSE SEMICOLON
 
-    ID  shift, and go to state 174
+    ID  shift, and go to state 179
 
 
-State 161
+State 166
 
    48 type_decl: TYPE TYPE_STRING COLON • ID SEMICOLON
    52          | TYPE TYPE_STRING COLON • ID COLON STRING_LITERAL SEMICOLON
 
-    ID  shift, and go to state 175
+    ID  shift, and go to state 180
 
 
-State 162
+State 167
 
     6 function: DEF ID LPAREN par_list RPAREN COLON RETURNS type $@1 stmt_list •
    26 stmt_list: stmt_list • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $end            reduce using rule 6 (function)
     $end            [reduce using rule 71 (call_args)]
+    OR              [reduce using rule 6 (function)]
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 6 (function)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 6 (function)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 6 (function)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 6 (function)]
@@ -3356,12 +3579,6 @@ State 162
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 6 (function)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 6 (function)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 6 (function)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 6 (function)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 6 (function)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 6 (function)]
@@ -3370,7 +3587,7 @@ State 162
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 92
+    stmt             go to state 93
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -3386,200 +3603,203 @@ State 162
     expr             go to state 69
 
 
-State 163
+State 168
+
+  102 expr: CALL ID LPAREN call_args • RPAREN
+
+    RPAREN  shift, and go to state 181
+
+
+State 169
 
    74 assignment_call: ID ASSIGN CALL ID LPAREN • call_args RPAREN SEMICOLON
   102 expr: CALL ID LPAREN • call_args RPAREN
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
     $default  reduce using rule 71 (call_args)
 
-    call_args  go to state 176
+    call_args  go to state 182
     call_list  go to state 65
     expr       go to state 69
 
 
-State 164
-
-  102 expr: CALL ID LPAREN call_args • RPAREN
-
-    RPAREN  shift, and go to state 177
-
-
-State 165
+State 170
 
    60 if_stmt: IF expr COLON stmt ELSE • COLON stmt
 
-    COLON  shift, and go to state 178
-
-
-State 166
-
-   57 if_stmt: IF expr COLON block ELSE • COLON block
-
-    COLON  shift, and go to state 179
-
-
-State 167
-
-   62 elif_list: ELIF • expr COLON block
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 180
-
-
-State 168
-
-   61 if_stmt: IF expr COLON block elif_list • ELSE COLON block
-   63 elif_list: elif_list • ELIF expr COLON block
-
-    ELSE  shift, and go to state 181
-    ELIF  shift, and go to state 182
-
-
-State 169
-
-   68 for_stmt: FOR LPAREN assignment expr SEMICOLON • expr RPAREN COLON stmt
-   69         | FOR LPAREN assignment expr SEMICOLON • expr RPAREN COLON block
-
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
-    LPAREN          shift, and go to state 52
-    LBRACK          shift, and go to state 53
-
-    expr  go to state 183
-
-
-State 170
-
-   75 void_call: CALL ID LPAREN call_args RPAREN • SEMICOLON
-  102 expr: CALL ID LPAREN call_args RPAREN •
-
-    SEMICOLON  shift, and go to state 184
-
-    $default  reduce using rule 102 (expr)
+    COLON  shift, and go to state 183
 
 
 State 171
 
-   45 type_decl: TYPE TYPE_INT COLON ID • SEMICOLON
-   50          | TYPE TYPE_INT COLON ID • COLON NUM SEMICOLON
+   57 if_stmt: IF expr COLON block ELSE • COLON block
 
-    COLON      shift, and go to state 185
-    SEMICOLON  shift, and go to state 186
+    COLON  shift, and go to state 184
 
 
 State 172
 
-   47 type_decl: TYPE TYPE_CHAR COLON ID • SEMICOLON
-   51          | TYPE TYPE_CHAR COLON ID • COLON CHAR_LITERAL SEMICOLON
+   62 elif_list: ELIF • expr COLON block
 
-    COLON      shift, and go to state 187
-    SEMICOLON  shift, and go to state 188
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 185
 
 
 State 173
 
-   49 type_decl: TYPE TYPE_REAL COLON ID • SEMICOLON
+   61 if_stmt: IF expr COLON block elif_list • ELSE COLON block
+   63 elif_list: elif_list • ELIF expr COLON block
 
-    SEMICOLON  shift, and go to state 189
+    ELSE  shift, and go to state 186
+    ELIF  shift, and go to state 187
 
 
 State 174
 
-   46 type_decl: TYPE TYPE_BOOL COLON ID • SEMICOLON
-   53          | TYPE TYPE_BOOL COLON ID • COLON TRUE SEMICOLON
-   54          | TYPE TYPE_BOOL COLON ID • COLON FALSE SEMICOLON
+   68 for_stmt: FOR LPAREN assignment expr SEMICOLON • expr RPAREN COLON stmt
+   69         | FOR LPAREN assignment expr SEMICOLON • expr RPAREN COLON block
+
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
+    LPAREN          shift, and go to state 52
+    LBRACK          shift, and go to state 53
+
+    expr  go to state 188
+
+
+State 175
+
+   75 void_call: CALL ID LPAREN call_args RPAREN • SEMICOLON
+  102 expr: CALL ID LPAREN call_args RPAREN •
+
+    SEMICOLON  shift, and go to state 189
+
+    $default  reduce using rule 102 (expr)
+
+
+State 176
+
+   45 type_decl: TYPE TYPE_INT COLON ID • SEMICOLON
+   50          | TYPE TYPE_INT COLON ID • COLON NUM SEMICOLON
 
     COLON      shift, and go to state 190
     SEMICOLON  shift, and go to state 191
 
 
-State 175
+State 177
 
-   48 type_decl: TYPE TYPE_STRING COLON ID • SEMICOLON
-   52          | TYPE TYPE_STRING COLON ID • COLON STRING_LITERAL SEMICOLON
+   47 type_decl: TYPE TYPE_CHAR COLON ID • SEMICOLON
+   51          | TYPE TYPE_CHAR COLON ID • COLON CHAR_LITERAL SEMICOLON
 
     COLON      shift, and go to state 192
     SEMICOLON  shift, and go to state 193
 
 
-State 176
+State 178
 
-   74 assignment_call: ID ASSIGN CALL ID LPAREN call_args • RPAREN SEMICOLON
-  102 expr: CALL ID LPAREN call_args • RPAREN
+   49 type_decl: TYPE TYPE_REAL COLON ID • SEMICOLON
 
-    RPAREN  shift, and go to state 194
+    SEMICOLON  shift, and go to state 194
 
 
-State 177
+State 179
+
+   46 type_decl: TYPE TYPE_BOOL COLON ID • SEMICOLON
+   53          | TYPE TYPE_BOOL COLON ID • COLON TRUE SEMICOLON
+   54          | TYPE TYPE_BOOL COLON ID • COLON FALSE SEMICOLON
+
+    COLON      shift, and go to state 195
+    SEMICOLON  shift, and go to state 196
+
+
+State 180
+
+   48 type_decl: TYPE TYPE_STRING COLON ID • SEMICOLON
+   52          | TYPE TYPE_STRING COLON ID • COLON STRING_LITERAL SEMICOLON
+
+    COLON      shift, and go to state 197
+    SEMICOLON  shift, and go to state 198
+
+
+State 181
 
   102 expr: CALL ID LPAREN call_args RPAREN •
 
     $default  reduce using rule 102 (expr)
 
 
-State 178
+State 182
+
+   74 assignment_call: ID ASSIGN CALL ID LPAREN call_args • RPAREN SEMICOLON
+  102 expr: CALL ID LPAREN call_args • RPAREN
+
+    RPAREN  shift, and go to state 199
+
+
+State 183
 
    60 if_stmt: IF expr COLON stmt ELSE COLON • stmt
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -3596,16 +3816,13 @@ State 178
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 195
+    stmt             go to state 200
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -3621,16 +3838,16 @@ State 178
     expr             go to state 69
 
 
-State 179
+State 184
 
    57 if_stmt: IF expr COLON block ELSE COLON • block
 
-    T_BEGIN  shift, and go to state 40
+    T_BEGIN  shift, and go to state 43
 
-    block  go to state 196
+    block  go to state 201
 
 
-State 180
+State 185
 
    62 elif_list: ELIF expr • COLON block
    80 expr: expr • PLUS expr
@@ -3643,49 +3860,53 @@ State 180
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
-    COLON  shift, and go to state 197
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+    COLON  shift, and go to state 202
 
 
-State 181
+State 186
 
    61 if_stmt: IF expr COLON block elif_list ELSE • COLON block
 
-    COLON  shift, and go to state 198
+    COLON  shift, and go to state 203
 
 
-State 182
+State 187
 
    63 elif_list: elif_list ELIF • expr COLON block
 
-    ID              shift, and go to state 77
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
-    CALL            shift, and go to state 78
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 73
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
+    CALL            shift, and go to state 74
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
-    expr  go to state 199
+    expr  go to state 204
 
 
-State 183
+State 188
 
    68 for_stmt: FOR LPAREN assignment expr SEMICOLON expr • RPAREN COLON stmt
    69         | FOR LPAREN assignment expr SEMICOLON expr • RPAREN COLON block
@@ -3699,136 +3920,140 @@ State 183
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ      shift, and go to state 94
-    NE      shift, and go to state 95
-    GT      shift, and go to state 96
-    GE      shift, and go to state 97
-    LT      shift, and go to state 98
-    LE      shift, and go to state 99
-    PLUS    shift, and go to state 100
-    MINUS   shift, and go to state 101
-    MULT    shift, and go to state 102
-    DIV     shift, and go to state 103
-    RPAREN  shift, and go to state 200
+    OR      shift, and go to state 95
+    AND     shift, and go to state 96
+    PLUS    shift, and go to state 97
+    MINUS   shift, and go to state 98
+    MULT    shift, and go to state 99
+    DIV     shift, and go to state 100
+    EQ      shift, and go to state 101
+    NE      shift, and go to state 102
+    GT      shift, and go to state 103
+    GE      shift, and go to state 104
+    LT      shift, and go to state 105
+    LE      shift, and go to state 106
+    RPAREN  shift, and go to state 205
 
 
-State 184
+State 189
 
    75 void_call: CALL ID LPAREN call_args RPAREN SEMICOLON •
 
     $default  reduce using rule 75 (void_call)
 
 
-State 185
+State 190
 
    50 type_decl: TYPE TYPE_INT COLON ID COLON • NUM SEMICOLON
 
-    NUM  shift, and go to state 201
+    NUM  shift, and go to state 206
 
 
-State 186
+State 191
 
    45 type_decl: TYPE TYPE_INT COLON ID SEMICOLON •
 
     $default  reduce using rule 45 (type_decl)
 
 
-State 187
+State 192
 
    51 type_decl: TYPE TYPE_CHAR COLON ID COLON • CHAR_LITERAL SEMICOLON
 
-    CHAR_LITERAL  shift, and go to state 202
+    CHAR_LITERAL  shift, and go to state 207
 
 
-State 188
+State 193
 
    47 type_decl: TYPE TYPE_CHAR COLON ID SEMICOLON •
 
     $default  reduce using rule 47 (type_decl)
 
 
-State 189
+State 194
 
    49 type_decl: TYPE TYPE_REAL COLON ID SEMICOLON •
 
     $default  reduce using rule 49 (type_decl)
 
 
-State 190
+State 195
 
    53 type_decl: TYPE TYPE_BOOL COLON ID COLON • TRUE SEMICOLON
    54          | TYPE TYPE_BOOL COLON ID COLON • FALSE SEMICOLON
 
-    TRUE   shift, and go to state 203
-    FALSE  shift, and go to state 204
+    TRUE   shift, and go to state 208
+    FALSE  shift, and go to state 209
 
 
-State 191
+State 196
 
    46 type_decl: TYPE TYPE_BOOL COLON ID SEMICOLON •
 
     $default  reduce using rule 46 (type_decl)
 
 
-State 192
+State 197
 
    52 type_decl: TYPE TYPE_STRING COLON ID COLON • STRING_LITERAL SEMICOLON
 
-    STRING_LITERAL  shift, and go to state 205
+    STRING_LITERAL  shift, and go to state 210
 
 
-State 193
+State 198
 
    48 type_decl: TYPE TYPE_STRING COLON ID SEMICOLON •
 
     $default  reduce using rule 48 (type_decl)
 
 
-State 194
+State 199
 
    74 assignment_call: ID ASSIGN CALL ID LPAREN call_args RPAREN • SEMICOLON
   102 expr: CALL ID LPAREN call_args RPAREN •
 
-    SEMICOLON  shift, and go to state 206
+    SEMICOLON  shift, and go to state 211
 
     SEMICOLON  [reduce using rule 102 (expr)]
     $default   reduce using rule 102 (expr)
 
 
-State 195
+State 200
 
    60 if_stmt: IF expr COLON stmt ELSE COLON stmt •
 
     $default  reduce using rule 60 (if_stmt)
 
 
-State 196
+State 201
 
    57 if_stmt: IF expr COLON block ELSE COLON block •
 
     $default  reduce using rule 57 (if_stmt)
 
 
-State 197
+State 202
 
    62 elif_list: ELIF expr COLON • block
 
-    T_BEGIN  shift, and go to state 40
+    T_BEGIN  shift, and go to state 43
 
-    block  go to state 207
+    block  go to state 212
 
 
-State 198
+State 203
 
    61 if_stmt: IF expr COLON block elif_list ELSE COLON • block
 
-    T_BEGIN  shift, and go to state 40
+    T_BEGIN  shift, and go to state 43
 
-    block  go to state 208
+    block  go to state 213
 
 
-State 199
+State 204
 
    63 elif_list: elif_list ELIF expr • COLON block
    80 expr: expr • PLUS expr
@@ -3841,120 +4066,127 @@ State 199
    87     | expr • GT expr
    88     | expr • LE expr
    89     | expr • GE expr
+  104     | expr • AND expr
+  105     | expr • OR expr
 
-    EQ     shift, and go to state 94
-    NE     shift, and go to state 95
-    GT     shift, and go to state 96
-    GE     shift, and go to state 97
-    LT     shift, and go to state 98
-    LE     shift, and go to state 99
-    PLUS   shift, and go to state 100
-    MINUS  shift, and go to state 101
-    MULT   shift, and go to state 102
-    DIV    shift, and go to state 103
-    COLON  shift, and go to state 209
-
-
-State 200
-
-   68 for_stmt: FOR LPAREN assignment expr SEMICOLON expr RPAREN • COLON stmt
-   69         | FOR LPAREN assignment expr SEMICOLON expr RPAREN • COLON block
-
-    COLON  shift, and go to state 210
-
-
-State 201
-
-   50 type_decl: TYPE TYPE_INT COLON ID COLON NUM • SEMICOLON
-
-    SEMICOLON  shift, and go to state 211
-
-
-State 202
-
-   51 type_decl: TYPE TYPE_CHAR COLON ID COLON CHAR_LITERAL • SEMICOLON
-
-    SEMICOLON  shift, and go to state 212
-
-
-State 203
-
-   53 type_decl: TYPE TYPE_BOOL COLON ID COLON TRUE • SEMICOLON
-
-    SEMICOLON  shift, and go to state 213
-
-
-State 204
-
-   54 type_decl: TYPE TYPE_BOOL COLON ID COLON FALSE • SEMICOLON
-
-    SEMICOLON  shift, and go to state 214
+    OR     shift, and go to state 95
+    AND    shift, and go to state 96
+    PLUS   shift, and go to state 97
+    MINUS  shift, and go to state 98
+    MULT   shift, and go to state 99
+    DIV    shift, and go to state 100
+    EQ     shift, and go to state 101
+    NE     shift, and go to state 102
+    GT     shift, and go to state 103
+    GE     shift, and go to state 104
+    LT     shift, and go to state 105
+    LE     shift, and go to state 106
+    COLON  shift, and go to state 214
 
 
 State 205
 
-   52 type_decl: TYPE TYPE_STRING COLON ID COLON STRING_LITERAL • SEMICOLON
+   68 for_stmt: FOR LPAREN assignment expr SEMICOLON expr RPAREN • COLON stmt
+   69         | FOR LPAREN assignment expr SEMICOLON expr RPAREN • COLON block
 
-    SEMICOLON  shift, and go to state 215
+    COLON  shift, and go to state 215
 
 
 State 206
+
+   50 type_decl: TYPE TYPE_INT COLON ID COLON NUM • SEMICOLON
+
+    SEMICOLON  shift, and go to state 216
+
+
+State 207
+
+   51 type_decl: TYPE TYPE_CHAR COLON ID COLON CHAR_LITERAL • SEMICOLON
+
+    SEMICOLON  shift, and go to state 217
+
+
+State 208
+
+   53 type_decl: TYPE TYPE_BOOL COLON ID COLON TRUE • SEMICOLON
+
+    SEMICOLON  shift, and go to state 218
+
+
+State 209
+
+   54 type_decl: TYPE TYPE_BOOL COLON ID COLON FALSE • SEMICOLON
+
+    SEMICOLON  shift, and go to state 219
+
+
+State 210
+
+   52 type_decl: TYPE TYPE_STRING COLON ID COLON STRING_LITERAL • SEMICOLON
+
+    SEMICOLON  shift, and go to state 220
+
+
+State 211
 
    74 assignment_call: ID ASSIGN CALL ID LPAREN call_args RPAREN SEMICOLON •
 
     $default  reduce using rule 74 (assignment_call)
 
 
-State 207
+State 212
 
    62 elif_list: ELIF expr COLON block •
 
     $default  reduce using rule 62 (elif_list)
 
 
-State 208
+State 213
 
    61 if_stmt: IF expr COLON block elif_list ELSE COLON block •
 
     $default  reduce using rule 61 (if_stmt)
 
 
-State 209
+State 214
 
    63 elif_list: elif_list ELIF expr COLON • block
 
-    T_BEGIN  shift, and go to state 40
+    T_BEGIN  shift, and go to state 43
 
-    block  go to state 216
+    block  go to state 221
 
 
-State 210
+State 215
 
    68 for_stmt: FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON • stmt
    69         | FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON • block
 
-    ID              shift, and go to state 34
-    CHAR_LITERAL    shift, and go to state 35
-    STRING_LITERAL  shift, and go to state 36
-    NUM             shift, and go to state 37
-    TRUE            shift, and go to state 38
-    FALSE           shift, and go to state 39
+    OR              shift, and go to state 34
+    AND             shift, and go to state 35
+    NOT             shift, and go to state 36
+    ID              shift, and go to state 37
+    CHAR_LITERAL    shift, and go to state 38
+    STRING_LITERAL  shift, and go to state 39
+    NUM             shift, and go to state 40
+    TRUE            shift, and go to state 41
+    FALSE           shift, and go to state 42
     DEF             shift, and go to state 2
-    T_BEGIN         shift, and go to state 40
-    IF              shift, and go to state 41
-    WHILE           shift, and go to state 42
-    FOR             shift, and go to state 43
-    DO              shift, and go to state 44
-    CALL            shift, and go to state 45
-    RETURN          shift, and go to state 46
-    VAR             shift, and go to state 47
-    NULLPTR         shift, and go to state 48
-    AND             shift, and go to state 49
-    OR              shift, and go to state 50
-    NOT             shift, and go to state 51
+    T_BEGIN         shift, and go to state 43
+    IF              shift, and go to state 44
+    WHILE           shift, and go to state 45
+    FOR             shift, and go to state 46
+    DO              shift, and go to state 47
+    CALL            shift, and go to state 48
+    RETURN          shift, and go to state 49
+    VAR             shift, and go to state 50
+    NULLPTR         shift, and go to state 51
     LPAREN          shift, and go to state 52
     LBRACK          shift, and go to state 53
 
+    OR              [reduce using rule 71 (call_args)]
+    AND             [reduce using rule 71 (call_args)]
+    NOT             [reduce using rule 71 (call_args)]
     ID              [reduce using rule 71 (call_args)]
     CHAR_LITERAL    [reduce using rule 71 (call_args)]
     STRING_LITERAL  [reduce using rule 71 (call_args)]
@@ -3971,16 +4203,13 @@ State 210
     RETURN          [reduce using rule 71 (call_args)]
     VAR             [reduce using rule 71 (call_args)]
     NULLPTR         [reduce using rule 71 (call_args)]
-    AND             [reduce using rule 71 (call_args)]
-    OR              [reduce using rule 71 (call_args)]
-    NOT             [reduce using rule 71 (call_args)]
     LPAREN          [reduce using rule 71 (call_args)]
     LBRACK          [reduce using rule 71 (call_args)]
     $default        reduce using rule 71 (call_args)
 
     func_list        go to state 54
     function         go to state 5
-    stmt             go to state 217
+    stmt             go to state 222
     assignment       go to state 57
     var_stmt         go to state 58
     return_stmt      go to state 59
@@ -3992,66 +4221,72 @@ State 210
     call_list        go to state 65
     assignment_call  go to state 66
     void_call        go to state 67
-    block            go to state 218
+    block            go to state 223
     expr             go to state 69
 
 
-State 211
+State 216
 
    50 type_decl: TYPE TYPE_INT COLON ID COLON NUM SEMICOLON •
 
     $default  reduce using rule 50 (type_decl)
 
 
-State 212
+State 217
 
    51 type_decl: TYPE TYPE_CHAR COLON ID COLON CHAR_LITERAL SEMICOLON •
 
     $default  reduce using rule 51 (type_decl)
 
 
-State 213
+State 218
 
    53 type_decl: TYPE TYPE_BOOL COLON ID COLON TRUE SEMICOLON •
 
     $default  reduce using rule 53 (type_decl)
 
 
-State 214
+State 219
 
    54 type_decl: TYPE TYPE_BOOL COLON ID COLON FALSE SEMICOLON •
 
     $default  reduce using rule 54 (type_decl)
 
 
-State 215
+State 220
 
    52 type_decl: TYPE TYPE_STRING COLON ID COLON STRING_LITERAL SEMICOLON •
 
     $default  reduce using rule 52 (type_decl)
 
 
-State 216
+State 221
 
    63 elif_list: elif_list ELIF expr COLON block •
 
     $default  reduce using rule 63 (elif_list)
 
 
-State 217
+State 222
 
    68 for_stmt: FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON stmt •
 
     $default  reduce using rule 68 (for_stmt)
 
 
-State 218
+State 223
 
    31 stmt: block •
    69 for_stmt: FOR LPAREN assignment expr SEMICOLON expr RPAREN COLON block •
 
     $end            reduce using rule 31 (stmt)
     $end            [reduce using rule 69 (for_stmt)]
+    OR              reduce using rule 31 (stmt)
+    OR              [reduce using rule 69 (for_stmt)]
+    AND             reduce using rule 31 (stmt)
+    AND             [reduce using rule 69 (for_stmt)]
+    NOT             reduce using rule 31 (stmt)
+    NOT             [reduce using rule 69 (for_stmt)]
     ID              reduce using rule 31 (stmt)
     ID              [reduce using rule 69 (for_stmt)]
     CHAR_LITERAL    reduce using rule 31 (stmt)
@@ -4088,12 +4323,6 @@ State 218
     VAR             [reduce using rule 69 (for_stmt)]
     NULLPTR         reduce using rule 31 (stmt)
     NULLPTR         [reduce using rule 69 (for_stmt)]
-    AND             reduce using rule 31 (stmt)
-    AND             [reduce using rule 69 (for_stmt)]
-    OR              reduce using rule 31 (stmt)
-    OR              [reduce using rule 69 (for_stmt)]
-    NOT             reduce using rule 31 (stmt)
-    NOT             [reduce using rule 69 (for_stmt)]
     LPAREN          reduce using rule 31 (stmt)
     LPAREN          [reduce using rule 69 (for_stmt)]
     LBRACK          reduce using rule 31 (stmt)

@@ -27,18 +27,21 @@
 }
 
 %start program
+%left OR
+%left AND
 %left PLUS MINUS
 %left MULT DIV
 %left EQ NE GT GE LT LE
+%right NOT
 
 %token <sval> ID CHAR_LITERAL STRING_LITERAL NUM TRUE FALSE
 %token <sval> TYPE_INT TYPE_CHAR TYPE_REAL TYPE_BOOL TYPE_STRING TYPE_INT_PTR TYPE_CHAR_PTR TYPE_REAL_PTR
 
-%token DEF T_BEGIN T_END IF ELSE ELIF WHILE FOR DO CALL RETURN RETURNS VAR NULLPTR
-%token AND OR NOT
+%token DEF T_BEGIN T_END IF ELSE ELIF WHILE FOR DO CALL RETURN RETURNS VAR NULLPTR ASSIGN ADDRESS
+//%token AND OR NOT
 
-%token EQ NE GT GE LT LE ASSIGN
-%token PLUS MINUS MULT DIV ADDRESS
+//%token EQ NE GT GE LT LE ASSIGN
+//%token PLUS MINUS MULT DIV ADDRESS
 
 %token COLON SEMICOLON COMMA LPAREN RPAREN LBRACK RBRACK BAR TYPE
 
@@ -363,36 +366,43 @@ return_stmt:
 if_stmt:
     IF expr COLON block ELSE COLON block
     {
+        check_boolean_condition($2, "if");
         $$ = make_node("IF-ELSE", 3, $2, $4, $7);
     }
   | IF expr COLON block
     {
+        check_boolean_condition($2, "if");
         $$ = make_node("IF", 2, $2, $4);
     }
-    | IF expr COLON stmt
+  | IF expr COLON stmt
     {
-         $$ =make_node("IF",2,$2,$4);
+        check_boolean_condition($2, "if");
+        $$ = make_node("IF", 2, $2, $4);
     }
-       | IF expr COLON stmt ELSE COLON stmt
+  | IF expr COLON stmt ELSE COLON stmt
     {
-         $$ =make_node("IF-ELSE",3,$2,$4,$7);
+        check_boolean_condition($2, "if");
+        $$ = make_node("IF-ELSE", 3, $2, $4, $7);
     }
-     | IF expr COLON block elif_list ELSE COLON block
-{
-    $$ = make_node("IF-ELIF-ELSE", 4, $2, $4, $5, $8);
-}
-  
+  | IF expr COLON block elif_list ELSE COLON block
+    {
+        check_boolean_condition($2, "if");
+        $$ = make_node("IF-ELIF-ELSE", 4, $2, $4, $5, $8);
+    }
 ;
+
+// And similarly for the elif_list rule
 elif_list: 
     ELIF expr COLON block
-	{
-        $$=make_node("ELIF",2,$2,$4);
-    }
-    |elif_list ELIF expr COLON block
     {
-        $$=make_node("ELIF - ...",3,$1,make_node("elif",2,$3,$5));
+        check_boolean_condition($2, "elif");
+        $$ = make_node("ELIF", 2, $2, $4);
     }
-
+    | elif_list ELIF expr COLON block
+    {
+        check_boolean_condition($3, "elif");
+        $$ = make_node("ELIF - ...", 3, $1, make_node("elif", 2, $3, $5));
+    }
 ;
 while_stmt:
     WHILE COLON expr SEMICOLON
@@ -575,6 +585,9 @@ expr:
         }
         $$ = make_node("call", 2, make_node($1, 0), $3); 
     }
+    | expr AND expr { $$ = make_node("and", 2, $1, $3); }
+    | expr OR expr { $$ = make_node("or", 2, $1, $3); }
+    | NOT expr { $$ = make_node("not", 1, $2); }
 ;
 
 %%

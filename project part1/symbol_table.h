@@ -66,5 +66,6 @@ void get_call_param_types_recursive(AST* node, DataType* types, int* index);
 
 // Add to symbols_table.h
 void check_return_type(AST* expr, const char* func_name);
+void check_boolean_condition(AST* expr, const char* construct_name);
 
 #endif // SYMBOL_TABLE_H

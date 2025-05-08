@@ -297,29 +297,82 @@ DataType get_expr_type(AST* expr) {
         return DT_VOID;
     
     // If it's a character literal (starts with single quote)
-    if (expr->name[0] == '\'')
+    if (expr->name && expr->name[0] == '\'')
         return DT_CHAR;
     
     // If it's a string literal (starts with double quote)
-    if (expr->name[0] == '"')
+    if (expr->name && expr->name[0] == '"')
         return DT_STRING;
     
     // If it's a number
-    if (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1])))
+    if (expr->name && (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1]))))
         return DT_INT;
     
     // If it's a boolean literal
-    if (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0)
+    if (expr->name && (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0))
         return DT_BOOL;
     
     // If it's a NULL pointer
-    if (strcmp(expr->name, "nullptr") == 0)
+    if (expr->name && strcmp(expr->name, "nullptr") == 0)
         return DT_PTR_INT;  // or any pointer type
     
+    // Boolean operations
+    if (expr->name) {
+        if (strcmp(expr->name, "and") == 0 || 
+            strcmp(expr->name, "or") == 0 || 
+            strcmp(expr->name, "not") == 0)
+            return DT_BOOL;
+        
+        // Comparison operations
+        if (strcmp(expr->name, "==") == 0 || 
+            strcmp(expr->name, "!=") == 0 || 
+            strcmp(expr->name, "<") == 0 || 
+            strcmp(expr->name, ">") == 0 || 
+            strcmp(expr->name, "<=") == 0 || 
+            strcmp(expr->name, ">=") == 0)
+            return DT_BOOL;
+    }
+    
     // If it's a variable, look it up in the symbol table
-    Symbol* sym = lookup_any_scope(expr->name);
-    if (sym)
-        return sym->type;
+    if (expr->name) {
+        Symbol* sym = lookup_any_scope(expr->name);
+        if (sym)
+            return sym->type;
+    }
+    
+    // If it has children, determine type based on operation
+    if (expr->child_count > 0) {
+        // Handle operations that return boolean results
+        if (expr->name) {
+            if (strcmp(expr->name, "and") == 0 || 
+                strcmp(expr->name, "or") == 0 || 
+                strcmp(expr->name, "not") == 0 ||
+                strcmp(expr->name, "==") == 0 || 
+                strcmp(expr->name, "!=") == 0 || 
+                strcmp(expr->name, "<") == 0 || 
+                strcmp(expr->name, ">") == 0 || 
+                strcmp(expr->name, "<=") == 0 || 
+                strcmp(expr->name, ">=") == 0)
+                return DT_BOOL;
+        }
+        
+        // For arithmetic operations, determine type based on operands
+        if (expr->name && (strcmp(expr->name, "+") == 0 || 
+                          strcmp(expr->name, "-") == 0 || 
+                          strcmp(expr->name, "*") == 0 || 
+                          strcmp(expr->name, "/") == 0)) {
+            DataType left = get_expr_type(expr->children[0]);
+            DataType right = expr->child_count > 1 ? get_expr_type(expr->children[1]) : DT_VOID;
+            
+            // If either operand is real, result is real
+            if (left == DT_REAL || right == DT_REAL)
+                return DT_REAL;
+            
+            // Otherwise if both are int, result is int
+            if (left == DT_INT && right == DT_INT)
+                return DT_INT;
+        }
+    }
     
     // Default to INT if we can't determine the type
     return DT_INT;
@@ -411,6 +464,17 @@ void get_call_param_types_recursive(AST* node, DataType* types, int* index) {
         types[(*index)++] = get_expr_type(node);
         printf("DEBUG: Extracted direct parameter of type %s\n", 
                get_name_from_type(types[(*index)-1]));
+    }
+}
+void check_boolean_condition(AST* expr, const char* construct_name) {
+    if (expr) {
+        DataType type = get_expr_type(expr);
+        if (type != DT_BOOL) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Condition in '%s' statement must be of boolean type, got %s", 
+                    construct_name, get_name_from_type(type));
+            yyerror(error_msg);
+        }
     }
 }
 // Add to symbols_table.c
