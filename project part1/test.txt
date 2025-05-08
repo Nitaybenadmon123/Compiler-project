@@ -1,17 +1,11 @@
-def _main_(): returns int
-var
-    type int:x:5;
-    type int:y:6;
+def _main_():
 begin
-  def foo():
+    if unknown_var > 10:  
     begin
-    end
-    x = 5;
-    return 6;
-    begin
-      def foo():
-      begin
-      end
+        call foo();
     end
 end
 
+def foo():
+begin
+end

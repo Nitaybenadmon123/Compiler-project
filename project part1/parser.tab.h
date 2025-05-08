@@ -58,30 +58,30 @@ extern int yydebug;
     CHAR_LITERAL = 259,            /* CHAR_LITERAL  */
     STRING_LITERAL = 260,          /* STRING_LITERAL  */
     NUM = 261,                     /* NUM  */
-    TYPE_INT = 262,                /* TYPE_INT  */
-    TYPE_CHAR = 263,               /* TYPE_CHAR  */
-    TYPE_REAL = 264,               /* TYPE_REAL  */
-    TYPE_BOOL = 265,               /* TYPE_BOOL  */
-    TYPE_STRING = 266,             /* TYPE_STRING  */
-    TYPE_INT_PTR = 267,            /* TYPE_INT_PTR  */
-    TYPE_CHAR_PTR = 268,           /* TYPE_CHAR_PTR  */
-    TYPE_REAL_PTR = 269,           /* TYPE_REAL_PTR  */
-    DEF = 270,                     /* DEF  */
-    T_BEGIN = 271,                 /* T_BEGIN  */
-    T_END = 272,                   /* T_END  */
-    IF = 273,                      /* IF  */
-    ELSE = 274,                    /* ELSE  */
-    ELIF = 275,                    /* ELIF  */
-    WHILE = 276,                   /* WHILE  */
-    FOR = 277,                     /* FOR  */
-    DO = 278,                      /* DO  */
-    CALL = 279,                    /* CALL  */
-    RETURN = 280,                  /* RETURN  */
-    RETURNS = 281,                 /* RETURNS  */
-    VAR = 282,                     /* VAR  */
-    NULLPTR = 283,                 /* NULLPTR  */
-    TRUE = 284,                    /* TRUE  */
-    FALSE = 285,                   /* FALSE  */
+    TRUE = 262,                    /* TRUE  */
+    FALSE = 263,                   /* FALSE  */
+    TYPE_INT = 264,                /* TYPE_INT  */
+    TYPE_CHAR = 265,               /* TYPE_CHAR  */
+    TYPE_REAL = 266,               /* TYPE_REAL  */
+    TYPE_BOOL = 267,               /* TYPE_BOOL  */
+    TYPE_STRING = 268,             /* TYPE_STRING  */
+    TYPE_INT_PTR = 269,            /* TYPE_INT_PTR  */
+    TYPE_CHAR_PTR = 270,           /* TYPE_CHAR_PTR  */
+    TYPE_REAL_PTR = 271,           /* TYPE_REAL_PTR  */
+    DEF = 272,                     /* DEF  */
+    T_BEGIN = 273,                 /* T_BEGIN  */
+    T_END = 274,                   /* T_END  */
+    IF = 275,                      /* IF  */
+    ELSE = 276,                    /* ELSE  */
+    ELIF = 277,                    /* ELIF  */
+    WHILE = 278,                   /* WHILE  */
+    FOR = 279,                     /* FOR  */
+    DO = 280,                      /* DO  */
+    CALL = 281,                    /* CALL  */
+    RETURN = 282,                  /* RETURN  */
+    RETURNS = 283,                 /* RETURNS  */
+    VAR = 284,                     /* VAR  */
+    NULLPTR = 285,                 /* NULLPTR  */
     AND = 286,                     /* AND  */
     OR = 287,                      /* OR  */
     NOT = 288,                     /* NOT  */
@@ -114,7 +114,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "parser.y"
+#line 29 "parser.y"
 
     struct ast_node* ast ;
     char* sval;

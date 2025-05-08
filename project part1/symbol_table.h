@@ -13,6 +13,7 @@ typedef struct Symbol {
     SymbolKind kind;
     DataType type;
     struct Symbol* next;
+    int param_count;
 } Symbol;
 
 typedef struct SymbolTable {
@@ -32,5 +33,10 @@ int symbol_exists_in_current_scope(const char* name);
 Symbol* lookup_any_scope(const char* name);
 DataType get_type_from_name(const char* type_str);
 void print_scope_hierarchy();
+void print_symbol_tables();
+const char* get_name_from_type(DataType type);
+void insert_checked_variable(const char* name, DataType type);
+void insert_function_symbol(char* name, DataType type, int param_count);
+
 
 #endif
