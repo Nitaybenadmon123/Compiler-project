@@ -3,6 +3,9 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+#define MAX_PARAMS 20  // מספר מקסימלי של פרמטרים
+
+
 typedef enum {
     DT_INT, DT_REAL, DT_CHAR, DT_BOOL,
     DT_STRING, DT_VOID, DT_PTR_INT, DT_PTR_CHAR, DT_PTR_REAL
@@ -16,6 +19,8 @@ typedef struct Symbol {
     DataType type;
     struct Symbol* next;
     int param_count;
+    DataType param_types[MAX_PARAMS];  // מערך של טיפוסי הפרמטרים
+
 } Symbol;
 
 typedef struct SymbolTable {
@@ -40,6 +45,13 @@ const char* get_name_from_type(DataType type);
 void insert_checked_variable(const char* name, DataType type);
 void insert_function_symbol(char* name, DataType type, int param_count);
 int count_params(AST* args_node);
+
+void insert_function_with_param_types(char* name, DataType type, int param_count, DataType* param_types);
+void collect_param_types(AST* par_list, DataType* param_types);
+void collect_call_param_types(AST* args_node, DataType* param_types);
+void check_function_call_param_types(char* func_name, AST* args_node);
+DataType get_expr_type(AST* expr);
+
 
 
 #endif

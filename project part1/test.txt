@@ -1,21 +1,16 @@
-def foo(): returns int
+def foo(par1 char: a; par2 int: b): returns int
 begin
     return a + b;
 end
 
-def goo(par1 int: a; par2 int: b): returns int
+def goo(par1 char: a; par2 int: b): returns int
 begin
     return a + b;
-end
-
-def foo():
-begin
 end
 
 def _main_(): returns int
 begin
-
-    call foo(1,2);  
+    call foo('b',1);  
     call goo(1,2);
 end
 

@@ -64,8 +64,10 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
+            DataType param_types[MAX_PARAMS];
             int param_count = count_params($4);
-            insert_function_symbol($2, get_type_from_name($8->name), param_count);
+            collect_param_types($4, param_types);
+            insert_function_with_param_types($2, get_type_from_name($8->name), param_count, param_types);
             printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
 
@@ -96,7 +98,8 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_function_symbol($2, get_type_from_name($7->name), 0);
+            DataType param_types[MAX_PARAMS];  // במקרה זה, אין פרמטרים
+            insert_function_with_param_types($2, get_type_from_name($7->name), 0, param_types);
             printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
 
@@ -124,8 +127,10 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
+            DataType param_types[MAX_PARAMS];
             int param_count = count_params($4);
-            insert_function_symbol($2, DT_VOID, param_count);
+            collect_param_types($4, param_types);
+            insert_function_with_param_types($2, DT_VOID, param_count, param_types);
             printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
 
@@ -153,7 +158,8 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_function_symbol($2, DT_VOID, 0);
+            DataType param_types[MAX_PARAMS];  // במקרה זה, אין פרמטרים
+            insert_function_with_param_types($2, DT_VOID, 0, param_types);
             printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
 
@@ -173,7 +179,6 @@ function:
     }
 ;
 
-
 par_list:
     param_list_item_list { $$ = make_node("ARGS", 1, $1); }
   | /* empty */ { $$ = make_node("ARGS", 1, make_node("NONE", 0)); }
@@ -191,6 +196,7 @@ param_list_item_list:
 
 par_list_item:
     ID type COLON ID {
+        // טיפוס הפרמטר הוא get_type_from_name($2->name)
         insert_symbol($4, VAR_SYM, get_type_from_name($2->name));
         printf("  Inserted parameter '%s' as variable in scope %d\n", $4, current_scope);
         
@@ -388,8 +394,8 @@ for_stmt:
 ;
 
 call_args:
-    call_list {$$=$1;}
-  | /*empty*/  {$$ =make_node("args", 1 ,make_node("none",0));}
+    call_list { $$ = make_node("args", 1, $1); }
+  | /* empty */ { $$ = make_node("args", 1, make_node("none", 0)); }
 ;
 
 call_list:
@@ -422,6 +428,9 @@ assignment_call:
                 char msg[150];
                 sprintf(msg, "Semantic Error: Function '%s' expects %d arguments, got %d", $4, expected, actual);
                 yyerror(msg);
+            } else {
+                // בדיקת טיפוסי פרמטרים
+                check_param_types($4, $6);
             }
         }
 
@@ -451,6 +460,9 @@ void_call:
                 char msg[150];
                 sprintf(msg, "Semantic Error: Function '%s' expects %d arguments, got %d", $2, expected, actual);
                 yyerror(msg);
+            } else {
+                // בדיקת טיפוסי פרמטרים
+                check_param_types($2, $4);
             }
         }
 
@@ -506,8 +518,30 @@ expr:
   |AND { $$ = make_node("and", 0); }
   |OR { $$ = make_node("or", 0); }
   |NOT { $$ = make_node("not", 0); }
-  |CALL ID LPAREN call_args RPAREN { $$ = make_node("call", 2,make_node($2,0),$4); }
-  | ID LPAREN call_args RPAREN { $$ = make_node("call", 2, make_node($1, 0), $3); } 
+  | CALL ID LPAREN call_args RPAREN { 
+        Symbol* func = lookup_any_scope($2);
+        if (func && func->kind == FUNC_SYM) {
+            int expected = func->param_count;
+            int actual = count_actual_params($4);
+            if (expected == actual) {
+                // בדיקת טיפוסי פרמטרים
+                check_param_types($2, $4);
+            }
+        }
+        $$ = make_node("call", 2, make_node($2, 0), $4); 
+    }
+    | ID LPAREN call_args RPAREN { 
+        Symbol* func = lookup_any_scope($1);
+        if (func && func->kind == FUNC_SYM) {
+            int expected = func->param_count;
+            int actual = count_actual_params($3);
+            if (expected == actual) {
+                // בדיקת טיפוסי פרמטרים
+                check_param_types($1, $3);
+            }
+        }
+        $$ = make_node("call", 2, make_node($1, 0), $3); 
+    }
 ;
 
 %%
@@ -533,4 +567,3 @@ int main(int argc, char* argv[]) {
 
     return result;
 }
-
