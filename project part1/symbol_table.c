@@ -161,3 +161,50 @@ void insert_function_symbol(char* name, DataType type, int param_count) {
            name, param_count, current_scope);
 }
 
+int count_params(AST* args_node) {
+    if (!args_node || args_node->child_count == 0)
+        return 0;
+
+    AST* list = args_node->children[0];
+    if (!list || strcmp(list->name, "NONE") == 0)
+        return 0;
+
+    int count = 0;
+    if (strcmp(list->name, "") == 0) {
+        for (int i = 0; i < list->child_count; i++) {
+            if (list->children[i])
+                count++;
+        }
+    } else {
+        count = 1;
+    }
+
+    return count;
+}
+
+int count_actual_params(AST* args_node) {
+    if (!args_node || strcmp(args_node->name, "args") != 0)
+        return 0;
+
+    AST* par_node = args_node->children[0];
+    if (!par_node || strcmp(par_node->name, "none") == 0)
+        return 0;
+
+    int count = 0;
+    AST* current = par_node;
+
+    while (current && strcmp(current->name, "par") == 0) {
+        if (current->child_count == 2) {
+            count++;
+            current = current->children[0];
+        } else if (current->child_count == 1) {
+            count++;
+            break;
+        } else {
+            break;
+        }
+    }
+
+    return count;
+}
+

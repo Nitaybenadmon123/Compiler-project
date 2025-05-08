@@ -1,3 +1,5 @@
+#include "ast.h"
+
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
@@ -37,6 +39,7 @@ void print_symbol_tables();
 const char* get_name_from_type(DataType type);
 void insert_checked_variable(const char* name, DataType type);
 void insert_function_symbol(char* name, DataType type, int param_count);
+int count_params(AST* args_node);
 
 
 #endif

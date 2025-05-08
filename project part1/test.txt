@@ -1,11 +1,21 @@
-def _main_():
+def foo(): returns int
 begin
-    if unknown_var > 10:  
-    begin
-        call foo();
-    end
+    return a + b;
+end
+
+def goo(par1 int: a; par2 int: b): returns int
+begin
+    return a + b;
 end
 
 def foo():
 begin
 end
+
+def _main_(): returns int
+begin
+
+    call foo(1,2);  
+    call goo(1,2);
+end
+

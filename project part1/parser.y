@@ -64,35 +64,30 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_symbol($2, FUNC_SYM, get_type_from_name($8->name));
-            printf("Pre-registered function '%s' in scope %d\n", $2, current_scope);
+            int param_count = count_params($4);
+            insert_function_symbol($2, get_type_from_name($8->name), param_count);
+            printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
-        
+
         if (strcmp($2, "_main_") == 0) {
-            if (main_defined) {
+            if (main_defined)
                 yyerror("Semantic Error: Multiple definitions of _main_ function");
-            }
             main_defined = 1;
             inside_main = 1;
-            
-            DataType return_type = get_type_from_name($8->name);
-            if (return_type != DT_VOID) {
-                yyerror("Semantic Error: _main_ function cannot return a value");
-            }
-            
-            if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0) {
+
+            if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0)
                 yyerror("Semantic Error: _main_ function cannot take arguments");
-            }
+
+            if (get_type_from_name($8->name) != DT_VOID)
+                yyerror("Semantic Error: _main_ function cannot return a value");
         }
     } stmt_list {
-        printf(">> DEF FUNC: '%s' with params and return, scope=%d\n", $2, current_scope);
         inside_main = 0;
-
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              $4,
              make_node("RET", 1, $8),
-             make_node("BODY", 1, $10)); 
+             make_node("BODY", 1, $10));
     }
 
   | DEF ID LPAREN RPAREN COLON RETURNS type {
@@ -101,93 +96,83 @@ function:
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_symbol($2, FUNC_SYM, get_type_from_name($7->name));
-            printf("Pre-registered function '%s' in scope %d\n", $2, current_scope);
+            insert_function_symbol($2, get_type_from_name($7->name), 0);
+            printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
-        
+
         if (strcmp($2, "_main_") == 0) {
-            if (main_defined) {
+            if (main_defined)
                 yyerror("Semantic Error: Multiple definitions of _main_ function");
-            }
             main_defined = 1;
             inside_main = 1;
-            
-            DataType return_type = get_type_from_name($7->name);
-            if (return_type != DT_VOID) {
+
+            if (get_type_from_name($7->name) != DT_VOID)
                 yyerror("Semantic Error: _main_ function cannot return a value");
-            }
         }
     } stmt_list {
-        printf(">> DEF FUNC: '%s' no params, with return, scope=%d\n", $2, current_scope);
         inside_main = 0;
-
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, $7),
-             make_node("BODY", 1, $9)); 
+             make_node("BODY", 1, $9));
     }
-    
+
   | DEF ID LPAREN par_list RPAREN COLON {
         if (symbol_exists_in_current_scope($2)) {
             char error_msg[100];
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_symbol($2, FUNC_SYM, DT_VOID);
-            printf("Pre-registered function '%s' in scope %d\n", $2, current_scope);
+            int param_count = count_params($4);
+            insert_function_symbol($2, DT_VOID, param_count);
+            printf("Pre-registered function '%s' in scope %d with %d params\n", $2, current_scope, param_count);
         }
-        
+
         if (strcmp($2, "_main_") == 0) {
-            if (main_defined) {
+            if (main_defined)
                 yyerror("Semantic Error: Multiple definitions of _main_ function");
-            }
             main_defined = 1;
             inside_main = 1;
-            
-            if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0) {
+
+            if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0)
                 yyerror("Semantic Error: _main_ function cannot take arguments");
-            }
         }
     } stmt_list {
-        printf(">> DEF FUNC: '%s' with params, no return, scope=%d\n", $2, current_scope);
         inside_main = 0;
-
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              $4,
              make_node("RET", 1, make_node("NONE", 0)),
-             make_node("BODY", 1, $8)); 
+             make_node("BODY", 1, $8));
     }
-    
+
   | DEF ID LPAREN RPAREN COLON {
         if (symbol_exists_in_current_scope($2)) {
             char error_msg[100];
             sprintf(error_msg, "Semantic Error: Function '%s' already defined in this block", $2);
             yyerror(error_msg);
         } else {
-            insert_symbol($2, FUNC_SYM, DT_VOID);
-            printf("Pre-registered function '%s' in scope %d\n", $2, current_scope);
+            insert_function_symbol($2, DT_VOID, 0);
+            printf("Pre-registered function '%s' in scope %d with 0 params\n", $2, current_scope);
         }
-        
+
         if (strcmp($2, "_main_") == 0) {
-            if (main_defined) {
+            if (main_defined)
                 yyerror("Semantic Error: Multiple definitions of _main_ function");
-            }
             main_defined = 1;
             inside_main = 1;
         }
     } stmt_list {
-        printf(">> DEF FUNC: '%s' no params, no return, scope=%d\n", $2, current_scope);
         inside_main = 0;
-
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, make_node("NONE", 0)),
-             make_node("BODY", 1, $7)); 
+             make_node("BODY", 1, $7));
     }
 ;
+
 
 par_list:
     param_list_item_list { $$ = make_node("ARGS", 1, $1); }
@@ -421,10 +406,23 @@ call_list:
 
 assignment_call:
     ID ASSIGN CALL ID LPAREN call_args RPAREN SEMICOLON {
-        if (!lookup_any_scope($4)) {
-            char err[100];
-            sprintf(err, "Semantic Error: Function '%s' called before declaration", $4);
-            yyerror(err);
+        Symbol* func = lookup_any_scope($4);
+        if (!func) {
+            char msg[100];
+            sprintf(msg, "Semantic Error: Function '%s' called before declaration", $4);
+            yyerror(msg);
+        } else if (func->kind != FUNC_SYM) {
+            char msg[100];
+            sprintf(msg, "Semantic Error: '%s' is not a function", $4);
+            yyerror(msg);
+        } else {
+            int expected = func->param_count;
+            int actual = count_actual_params($6);
+            if (expected != actual) {
+                char msg[150];
+                sprintf(msg, "Semantic Error: Function '%s' expects %d arguments, got %d", $4, expected, actual);
+                yyerror(msg);
+            }
         }
 
         $$ = make_node("ASSIGN-CALL", 2,
@@ -434,16 +432,32 @@ assignment_call:
 ;
 
 
+
 void_call:
     CALL ID LPAREN call_args RPAREN SEMICOLON {
-        if (!lookup_any_scope($2)) {
+        Symbol* func = lookup_any_scope($2);
+        if (!func) {
             char msg[100];
             sprintf(msg, "Semantic Error: Function '%s' called before declaration", $2);
             yyerror(msg);
+        } else if (func->kind != FUNC_SYM) {
+            char msg[100];
+            sprintf(msg, "Semantic Error: '%s' is not a function", $2);
+            yyerror(msg);
+        } else {
+            int expected = func->param_count;
+            int actual = count_actual_params($4);
+            if (expected != actual) {
+                char msg[150];
+                sprintf(msg, "Semantic Error: Function '%s' expects %d arguments, got %d", $2, expected, actual);
+                yyerror(msg);
+            }
         }
+
         $$ = make_node("CALL", 2, make_node($2, 0), $4);
     }
 ;
+
 block:
     T_BEGIN {
         enter_scope();
