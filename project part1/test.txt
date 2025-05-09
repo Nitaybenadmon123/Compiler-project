@@ -1,17 +1,40 @@
-def test_loop_conditions(): returns int
+def test_type_compatibility(): returns int
 var
-    type int:x:5;
-    type int:y:10;
-    type bool:flag:true;
-    type char:c:'a';
+    type int:i:10;
+    type real:r:3.14;
+    type char:c:'A';
+    type bool:b:true;
+    type string:s[10];
+    type char*:cp;
+    type int*:ip;
+    type real*:rp;
+   
 begin
-  for (x = 0; x; x = x + 1):
-        y = y - 1;
-
+    i = 5;                
+    r = 2.7;              
+    r = i;               
+    c = 'B';             
+    b = false;            
+    s = "hello";          
+    s[0] = 'h';           
+   
+    
+    i = r;                
+    i = c;               
+    i = b;                
+    i = "hello";          
+    c = i;                
+    b = i;                
+    s[0] = i;             
+    s[0] = r;             
+    s[0] = b;             
+    
+   
+    
     return 0;
 end
 
 def _main_():
 begin
-    call test_loop_conditions();
+    call test_type_compatibility();
 end

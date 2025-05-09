@@ -296,6 +296,11 @@ DataType get_expr_type(AST* expr) {
     if (!expr)
         return DT_VOID;
     
+    // Check for array access (string indexing)
+    if (expr->name && strcmp(expr->name, "array_access") == 0) {
+        return DT_CHAR;  // Accessing a string element always returns a char
+    }
+    
     // If it's a character literal (starts with single quote)
     if (expr->name && expr->name[0] == '\'')
         return DT_CHAR;
@@ -314,21 +319,21 @@ DataType get_expr_type(AST* expr) {
     
     // If it's a NULL pointer
     if (expr->name && strcmp(expr->name, "nullptr") == 0)
-        return DT_PTR_INT;  // or any pointer type
+        return DT_PTR_INT; // or any pointer type
     
     // Boolean operations
     if (expr->name) {
-        if (strcmp(expr->name, "and") == 0 || 
-            strcmp(expr->name, "or") == 0 || 
+        if (strcmp(expr->name, "and") == 0 ||
+            strcmp(expr->name, "or") == 0 ||
             strcmp(expr->name, "not") == 0)
             return DT_BOOL;
         
         // Comparison operations
-        if (strcmp(expr->name, "==") == 0 || 
-            strcmp(expr->name, "!=") == 0 || 
-            strcmp(expr->name, "<") == 0 || 
-            strcmp(expr->name, ">") == 0 || 
-            strcmp(expr->name, "<=") == 0 || 
+        if (strcmp(expr->name, "==") == 0 ||
+            strcmp(expr->name, "!=") == 0 ||
+            strcmp(expr->name, "<") == 0 ||
+            strcmp(expr->name, ">") == 0 ||
+            strcmp(expr->name, "<=") == 0 ||
             strcmp(expr->name, ">=") == 0)
             return DT_BOOL;
     }
@@ -344,22 +349,22 @@ DataType get_expr_type(AST* expr) {
     if (expr->child_count > 0) {
         // Handle operations that return boolean results
         if (expr->name) {
-            if (strcmp(expr->name, "and") == 0 || 
-                strcmp(expr->name, "or") == 0 || 
+            if (strcmp(expr->name, "and") == 0 ||
+                strcmp(expr->name, "or") == 0 ||
                 strcmp(expr->name, "not") == 0 ||
-                strcmp(expr->name, "==") == 0 || 
-                strcmp(expr->name, "!=") == 0 || 
-                strcmp(expr->name, "<") == 0 || 
-                strcmp(expr->name, ">") == 0 || 
-                strcmp(expr->name, "<=") == 0 || 
+                strcmp(expr->name, "==") == 0 ||
+                strcmp(expr->name, "!=") == 0 ||
+                strcmp(expr->name, "<") == 0 ||
+                strcmp(expr->name, ">") == 0 ||
+                strcmp(expr->name, "<=") == 0 ||
                 strcmp(expr->name, ">=") == 0)
                 return DT_BOOL;
         }
         
         // For arithmetic operations, determine type based on operands
-        if (expr->name && (strcmp(expr->name, "+") == 0 || 
-                          strcmp(expr->name, "-") == 0 || 
-                          strcmp(expr->name, "*") == 0 || 
+        if (expr->name && (strcmp(expr->name, "+") == 0 ||
+                          strcmp(expr->name, "-") == 0 ||
+                          strcmp(expr->name, "*") == 0 ||
                           strcmp(expr->name, "/") == 0)) {
             DataType left = get_expr_type(expr->children[0]);
             DataType right = expr->child_count > 1 ? get_expr_type(expr->children[1]) : DT_VOID;
@@ -520,4 +525,30 @@ void check_return_type(AST* expr, const char* func_name) {
             yyerror(msg);
         }
     }
+}
+// Add to symbol_table.c
+void check_string_index(AST* index_expr) {
+    if (index_expr) {
+        DataType type = get_expr_type(index_expr);
+        if (type != DT_INT) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: String index must be of integer type, got %s", 
+                    get_name_from_type(type));
+            yyerror(error_msg);
+        }
+    }
+}
+int is_type_compatible(DataType lhs, DataType rhs) {
+    // Same type is always compatible
+    if (lhs == rhs)
+        return 1;
+    
+    // Integer can be assigned to real (implicit conversion)
+    if (lhs == DT_REAL && rhs == DT_INT)
+        return 1;
+    
+    // Add other allowed conversions here if needed
+    
+    // All other combinations are incompatible
+    return 0;
 }

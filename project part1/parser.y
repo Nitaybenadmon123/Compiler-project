@@ -271,14 +271,62 @@ stmt:
 ;
 
 assignment:
-    ID ASSIGN expr SEMICOLON {
+   ID ASSIGN expr SEMICOLON {
         Symbol* sym = lookup_any_scope($1);
         if (!sym) {
             char error_msg[100];
             sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $1);
             yyerror(error_msg);
+        } else {
+            // Check type compatibility
+            DataType lhs_type = sym->type;
+            DataType rhs_type = get_expr_type($3);
+            
+            // Check if null is assigned to a non-pointer type
+            if (rhs_type == DT_PTR_INT && $3->name && strcmp($3->name, "nullptr") == 0) {
+                if (lhs_type != DT_PTR_INT && lhs_type != DT_PTR_CHAR && lhs_type != DT_PTR_REAL) {
+                    char error_msg[100];
+                    sprintf(error_msg, "Semantic Error: Cannot assign null to non-pointer type %s", 
+                            get_name_from_type(lhs_type));
+                    yyerror(error_msg);
+                }
+            }
+            // Check general type compatibility
+            else if (!is_type_compatible(lhs_type, rhs_type)) {
+                char error_msg[100];
+                sprintf(error_msg, "Semantic Error: Type mismatch in assignment, cannot assign %s to %s", 
+                        get_name_from_type(rhs_type), get_name_from_type(lhs_type));
+                yyerror(error_msg);
+            }
         }
         $$ = make_node("=", 2, make_node($1, 0), $3);
+    }
+    | ID LBRACK expr RBRACK ASSIGN expr SEMICOLON {
+        // Check that the variable is a string
+        Symbol* sym = lookup_any_scope($1);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $1);
+            yyerror(error_msg);
+        } else if (sym->type != DT_STRING) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: [] operator can only be used with string type, '%s' is of type %s", 
+                    $1, get_name_from_type(sym->type));
+            yyerror(error_msg);
+        } else {
+            // Check that the index is an integer
+            check_string_index($3);
+            
+            // Check that the assigned value is a char
+            DataType rhs_type = get_expr_type($6);
+            if (rhs_type != DT_CHAR) {
+                char error_msg[100];
+                sprintf(error_msg, "Semantic Error: String element can only be assigned a char value, got %s", 
+                        get_name_from_type(rhs_type));
+                yyerror(error_msg);
+            }
+        }
+        $$ = make_node("=", 2, make_node("array_access", 2, make_node($1, 0), $3), $6);
     }
 ;
 var_stmt:
@@ -318,6 +366,10 @@ type_decl:
         insert_checked_variable($4, DT_REAL);
         $$ = make_node("TYPE", 2, make_node("real", 0), make_node($4, 0));
     }
+    | TYPE TYPE_REAL COLON ID COLON NUM SEMICOLON {
+        insert_checked_variable($4, DT_REAL);
+        $$ = make_node("TYPE", 2, make_node("real", 0), make_node($4, 1,make_node($6,0)));
+    }
   | TYPE TYPE_INT COLON ID COLON NUM SEMICOLON {
         insert_checked_variable($4, DT_INT);
         $$ = make_node("TYPE", 2, make_node("int", 0), make_node($4, 1, make_node($6, 0)));
@@ -337,6 +389,16 @@ type_decl:
   | TYPE TYPE_BOOL COLON ID COLON FALSE SEMICOLON {
         insert_checked_variable($4, DT_BOOL);
         $$ = make_node("TYPE", 2, make_node("bool", 0), make_node($4, 1, make_node("false", 0)));
+    }
+   | TYPE TYPE_STRING COLON ID LBRACK NUM RBRACK SEMICOLON {
+        int size = atoi($6);
+        if (size <= 0) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: String size must be a positive integer");
+            yyerror(error_msg);
+        }
+        insert_checked_variable($4, DT_STRING);
+        $$ = make_node("TYPE", 3, make_node("string", 0), make_node($4, 0), make_node($6, 0));
     }
 ;
 
@@ -551,20 +613,49 @@ block:
 ;
 
 expr:
-    expr PLUS expr   { $$ = make_node("+", 2, $1, $3); }
-  | expr MINUS expr  { $$ = make_node("-", 2, $1, $3); }
-  | expr MULT expr   { $$ = make_node("*", 2, $1, $3); }
-  | expr DIV expr    { $$ = make_node("/", 2, $1, $3); }
-  | expr EQ expr     { $$ = make_node("==", 2, $1, $3); }
-  | expr NE expr     { $$ = make_node("!=", 2, $1, $3); }
-  | expr LT expr     { $$ = make_node("<", 2, $1, $3); }
-  | expr GT expr     { $$ = make_node(">", 2, $1, $3); }
-  | expr LE expr     { $$ = make_node("<=", 2, $1, $3); }
-  | expr GE expr     { $$ = make_node(">=", 2, $1, $3); }
-  | LPAREN expr RPAREN { $$ = $2; }
- | LBRACK expr RBRACK {$$=$2;}
-  | NUM             { $$ = make_node($1, 0); }
-  | ID {
+    expr PLUS expr { $$ = make_node("+", 2, $1, $3); }
+    | expr MINUS expr { $$ = make_node("-", 2, $1, $3); }
+    | expr MULT expr { $$ = make_node("*", 2, $1, $3); }
+    | expr DIV expr { $$ = make_node("/", 2, $1, $3); }
+    | expr EQ expr { $$ = make_node("==", 2, $1, $3); }
+    | expr NE expr { $$ = make_node("!=", 2, $1, $3); }
+    | expr LT expr { $$ = make_node("<", 2, $1, $3); }
+    | expr GT expr { $$ = make_node(">", 2, $1, $3); }
+    | expr LE expr { $$ = make_node("<=", 2, $1, $3); }
+    | expr GE expr { $$ = make_node(">=", 2, $1, $3); }
+    | LPAREN expr RPAREN { $$ = $2; }
+    
+    // New rule for array access
+    | ID LBRACK expr RBRACK {
+        // Check that the variable is a string
+        Symbol* sym = lookup_any_scope($1);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $1);
+            yyerror(error_msg);
+        } else if (sym->type != DT_STRING) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: [] operator can only be used with string type, '%s' is of type %s", 
+                    $1, get_name_from_type(sym->type));
+            yyerror(error_msg);
+        } else {
+            // Check that the index is an integer
+            check_string_index($3);
+        }
+        $$ = make_node("array_access", 2, make_node($1, 0), $3);
+    }
+
+    // Remove or modify this rule
+    | LBRACK expr RBRACK {
+        // This rule should not be used for array access
+        char error_msg[100];
+        sprintf(error_msg, "Semantic Error: Invalid use of [] operator");
+        yyerror(error_msg);
+        $$ = $2; // Fallback to avoid further errors
+    }
+    
+    | NUM { $$ = make_node($1, 0); }
+    | ID {
         Symbol* sym = lookup_any_scope($1);
         if (!sym) {
             char error_msg[100];
@@ -573,15 +664,15 @@ expr:
         }
         $$ = make_node($1, 0);
     }
-  | CHAR_LITERAL      { $$ = make_node($1, 0); }
-  |STRING_LITERAL    { $$ = make_node($1, 0); }
-  |NULLPTR { $$ = make_node("nullptr", 0); }
-  |TRUE { $$ = make_node("true", 0); }
-  |FALSE { $$ = make_node("false", 0); }
-  |AND { $$ = make_node("and", 0); }
-  |OR { $$ = make_node("or", 0); }
-  |NOT { $$ = make_node("not", 0); }
-  | CALL ID LPAREN call_args RPAREN { 
+    | CHAR_LITERAL { $$ = make_node($1, 0); }
+    | STRING_LITERAL { $$ = make_node($1, 0); }
+    | NULLPTR { $$ = make_node("nullptr", 0); }
+    | TRUE { $$ = make_node("true", 0); }
+    | FALSE { $$ = make_node("false", 0); }
+    | AND { $$ = make_node("and", 0); }
+    | OR { $$ = make_node("or", 0); }
+    | NOT { $$ = make_node("not", 0); }
+    | CALL ID LPAREN call_args RPAREN {
         Symbol* func = lookup_any_scope($2);
         if (func && func->kind == FUNC_SYM) {
             int expected = func->param_count;
@@ -591,9 +682,9 @@ expr:
                 check_param_types($2, $4);
             }
         }
-        $$ = make_node("call", 2, make_node($2, 0), $4); 
+        $$ = make_node("call", 2, make_node($2, 0), $4);
     }
-    | ID LPAREN call_args RPAREN { 
+    | ID LPAREN call_args RPAREN {
         Symbol* func = lookup_any_scope($1);
         if (func && func->kind == FUNC_SYM) {
             int expected = func->param_count;
@@ -603,7 +694,7 @@ expr:
                 check_param_types($1, $3);
             }
         }
-        $$ = make_node("call", 2, make_node($1, 0), $3); 
+        $$ = make_node("call", 2, make_node($1, 0), $3);
     }
     | expr AND expr { $$ = make_node("and", 2, $1, $3); }
     | expr OR expr { $$ = make_node("or", 2, $1, $3); }
