@@ -41,6 +41,10 @@ INT_NUM [1-9][0-9]*|0
 "char"       { yylval.sval = strdup(yytext); return TYPE_CHAR; }
 "bool"       {  yylval.sval = strdup(yytext); return TYPE_BOOL; }
 "string"     { yylval.sval = strdup(yytext); return TYPE_STRING; }
+"int"[ \t]*"*"       { yylval.sval = strdup("int*"); return TYPE_INT_PTR; }
+"char"[ \t]*"*"      { yylval.sval = strdup("char*"); return TYPE_CHAR_PTR; }
+"real"[ \t]*"*"      { yylval.sval = strdup("real*"); return TYPE_REAL_PTR; }
+
 
 ":"          {return COLON; }
 ";"          {  return SEMICOLON; }

@@ -8,33 +8,42 @@ var
     type char*:cp;
     type int*:ip;
     type real*:rp;
-   
 begin
-    i = 5;                
-    r = 2.7;              
-    r = i;               
-    c = 'B';             
-    b = false;            
-    s = "hello";          
-    s[0] = 'h';           
-   
+    i = 5;
+    r = 2.7;
+    r = i;
+    c = 'B';
+    b = false;
+    s = "hello";
+    s[0] = 'h';
+    cp = &c;
+    ip = &i;
+    rp = &r;
     
-    i = r;                
-    i = c;               
-    i = b;                
-    i = "hello";          
-    c = i;                
-    b = i;                
-    s[0] = i;             
-    s[0] = r;             
-    s[0] = b;             
+    i = r;
+    i = c;
+    i = b;
+    i = "hello";
+    c = i;
+    b = i;
+    s[0] = i;
+    s[0] = r;
+    s[0] = b;
     
-   
+    cp = null;
+    ip = null;
+    rp = null;
+    
+    i = null;
+    r = null;
+    c = null;
+    b = null;
+    s = null;
+    s[0] = null;
     
     return 0;
 end
-
 def _main_():
 begin
-    call test_type_compatibility();
+    call test_type_compatibility(1);
 end

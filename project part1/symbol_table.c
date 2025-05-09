@@ -295,6 +295,55 @@ void collect_params_recursive(AST* node, DataType* param_types, int* index) {
 DataType get_expr_type(AST* expr) {
     if (!expr)
         return DT_VOID;
+
+
+    // אם זו פעולת לקיחת כתובת
+    if (expr->name && strcmp(expr->name, "&") == 0 && expr->child_count == 1) {
+        DataType operand_type = get_expr_type(expr->children[0]);
+        
+        // המרת טיפוס לטיפוס מצביע מתאים
+        if (operand_type == DT_INT) return DT_PTR_INT;
+        if (operand_type == DT_CHAR) return DT_PTR_CHAR;
+        if (operand_type == DT_REAL) return DT_PTR_REAL;
+        return DT_VOID; // שגיאה סמנטית
+    }
+    
+    // אם זו פעולת dereferencing
+    if (expr->name && strcmp(expr->name, "*") == 0 && expr->child_count == 1) {
+        DataType operand_type = get_expr_type(expr->children[0]);
+        
+        // המרת טיפוס מצביע לטיפוס הבסיס
+        if (operand_type == DT_PTR_INT) return DT_INT;
+        if (operand_type == DT_PTR_CHAR) return DT_CHAR;
+        if (operand_type == DT_PTR_REAL) return DT_REAL;
+        return DT_VOID; // שגיאה סמנטית
+    }
+    
+    // אם זו פעולת לקיחת כתובת
+    if (expr->name && strcmp(expr->name, "&") == 0 && expr->child_count == 1) {
+        DataType operand_type = get_expr_type(expr->children[0]);
+        
+        // המרת טיפוס לטיפוס מצביע מתאים
+        switch (operand_type) {
+            case DT_INT: return DT_PTR_INT;
+            case DT_CHAR: return DT_PTR_CHAR;
+            case DT_REAL: return DT_PTR_REAL;
+            default: return DT_VOID; // שגיאה סמנטית שתזוהה במקום אחר
+        }
+    }
+    
+    // אם זו פעולת dereferencing
+    if (expr->name && strcmp(expr->name, "*") == 0 && expr->child_count == 1) {
+        DataType operand_type = get_expr_type(expr->children[0]);
+        
+        // המרת טיפוס מצביע לטיפוס הבסיס
+        switch (operand_type) {
+            case DT_PTR_INT: return DT_INT;
+            case DT_PTR_CHAR: return DT_CHAR;
+            case DT_PTR_REAL: return DT_REAL;
+            default: return DT_VOID; // שגיאה סמנטית שתזוהה במקום אחר
+        }
+    }
     
     // Check for array access (string indexing)
     if (expr->name && strcmp(expr->name, "array_access") == 0) {
@@ -551,4 +600,16 @@ int is_type_compatible(DataType lhs, DataType rhs) {
     
     // All other combinations are incompatible
     return 0;
+}
+// פונקציה לבדיקה האם טיפוס הוא מצביע
+int is_pointer_type(DataType type) {
+    return (type == DT_PTR_INT || type == DT_PTR_CHAR || type == DT_PTR_REAL);
+}
+
+// פונקציה לקבלת טיפוס הבסיס של מצביע
+DataType get_base_type(DataType ptr_type) {
+    if (ptr_type == DT_PTR_INT) return DT_INT;
+    if (ptr_type == DT_PTR_CHAR) return DT_CHAR;
+    if (ptr_type == DT_PTR_REAL) return DT_REAL;
+    return DT_VOID; // לא מצביע תקין
 }

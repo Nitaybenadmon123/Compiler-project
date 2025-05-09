@@ -328,7 +328,41 @@ assignment:
         }
         $$ = make_node("=", 2, make_node("array_access", 2, make_node($1, 0), $3), $6);
     }
+  | MULT ID ASSIGN expr SEMICOLON {
+        Symbol* sym = lookup_any_scope($2);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+            yyerror(error_msg);
+        }
+        
+        // בדיקה סמנטית - האם המשתנה הוא מצביע
+        DataType type = sym->type;
+        if (!is_pointer_type(type)) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Cannot dereference non-pointer variable '%s'", $2);
+            yyerror(error_msg);
+        }
+        
+        // מציאת הטיפוס שהמצביע מצביע אליו
+        DataType target_type = get_base_type(type);
+        
+        // בדיקת התאמת טיפוסים בהשמה
+        DataType expr_type = get_expr_type($4);
+        if (target_type != expr_type) {
+            // בדיקת המרה אפשרית מ-INT ל-REAL
+            if (!(target_type == DT_REAL && expr_type == DT_INT)) {
+                char error_msg[100];
+                sprintf(error_msg, "Semantic Error: Type mismatch in assignment to dereferenced pointer: expected %s, got %s",
+                        get_name_from_type(target_type), get_name_from_type(expr_type));
+                yyerror(error_msg);
+            }
+        }
+        
+        $$ = make_node("=", 2, make_node("*", 1, make_node($2, 0)), $4);
+    }
 ;
+
 var_stmt:
     VAR type_decls block {
         $$ = make_node("VAR", 2, $2, $3);
@@ -399,6 +433,18 @@ type_decl:
         }
         insert_checked_variable($4, DT_STRING);
         $$ = make_node("TYPE", 3, make_node("string", 0), make_node($4, 0), make_node($6, 0));
+    }
+    | TYPE TYPE_INT_PTR COLON ID SEMICOLON {
+        insert_checked_variable($4, DT_PTR_INT);
+        $$ = make_node("TYPE", 2, make_node("int*", 0), make_node($4, 0));
+    }
+  | TYPE TYPE_CHAR_PTR COLON ID SEMICOLON {
+        insert_checked_variable($4, DT_PTR_CHAR);
+        $$ = make_node("TYPE", 2, make_node("char*", 0), make_node($4, 0));
+    }
+  | TYPE TYPE_REAL_PTR COLON ID SEMICOLON {
+        insert_checked_variable($4, DT_PTR_REAL);
+        $$ = make_node("TYPE", 2, make_node("real*", 0), make_node($4, 0));
     }
 ;
 
@@ -699,6 +745,45 @@ expr:
     | expr AND expr { $$ = make_node("and", 2, $1, $3); }
     | expr OR expr { $$ = make_node("or", 2, $1, $3); }
     | NOT expr { $$ = make_node("not", 1, $2); }
+
+    /* חוקים קיימים */
+  | MULT ID {
+        Symbol* sym = lookup_any_scope($2);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+            yyerror(error_msg);
+        }
+        
+        // בדיקה סמנטית - האם המשתנה הוא מצביע
+        DataType type = sym->type;
+        if (!is_pointer_type(type)) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Cannot dereference non-pointer variable '%s'", $2);
+            yyerror(error_msg);
+        }
+        
+        $$ = make_node("*", 1, make_node($2, 0));
+    }
+  | ADDRESS ID {
+        Symbol* sym = lookup_any_scope($2);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+            yyerror(error_msg);
+        }
+        
+        // בדיקה סמנטית - האם ניתן לקחת את הכתובת של המשתנה
+        DataType type = sym->type;
+        if (type != DT_INT && type != DT_REAL && type != DT_CHAR && type != DT_STRING) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Cannot take address of '%s' with type %s", 
+                    $2, get_name_from_type(type));
+            yyerror(error_msg);
+        }
+        
+        $$ = make_node("&", 1, make_node($2, 0));
+    }
 ;
 
 %%
