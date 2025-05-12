@@ -1,0 +1,4 @@
+def wrong_params(par2 int:y; par1 char:d; par3 real:s): returns int
+begin
+    return 0;
+end
