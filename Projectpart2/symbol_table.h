@@ -64,5 +64,7 @@ int can_take_address(DataType type);
 DataType get_base_type(DataType ptr_type);
 int get_expected_param_number(const char* param_name);
 void check_param_order(const char* param_name, int expected_number);
+void add_multiple_variables(AST* id_list, DataType type);
+
 
 #endif // SYMBOL_TABLE_H

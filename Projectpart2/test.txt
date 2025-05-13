@@ -1,4 +1,18 @@
-def wrong_params(par2 int:y; par1 char:d; par3 real:s): returns int
+def foo(par1 int:i; par2 int:j; par3 int:k): returns int
 begin
+    def fee(par1 int:l; par2 char:m; par3 real:x): returns bool
+    begin
+        return TRUE;
+    end
     return 0;
+end
+
+def _main_():
+var
+    type int: a, b, c, result;
+begin 
+    a = 1;
+    b = 2;
+    c = 3;
+    result = call foo(a, b, c);
 end

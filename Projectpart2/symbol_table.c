@@ -490,6 +490,7 @@ void check_return_type(AST* expr, const char* func_name) {
         return;
     }
     
+    /* empty return (“return;”) */
     if (expr && strcmp(expr->name, "NONE") == 0) {
         if (func->type != DT_VOID) {
             char msg[200];
@@ -500,6 +501,7 @@ void check_return_type(AST* expr, const char* func_name) {
         return;
     }
     
+    /* void function returning a value */
     if (func->type == DT_VOID && expr && strcmp(expr->name, "NONE") != 0) {
         char msg[200];
         sprintf(msg, "Semantic Error: Function '%s' has void return type but returns a value", 
@@ -512,15 +514,24 @@ void check_return_type(AST* expr, const char* func_name) {
     printf("DEBUG: Function '%s' returns type %s, expression has type %s\n", 
             func_name, get_name_from_type(func->type), get_name_from_type(expr_type));
     
+    /* allow implicit conversions: int→real and int→bool */
+    if ((func->type == DT_REAL && expr_type == DT_INT) ||
+        (func->type == DT_BOOL && expr_type == DT_INT)) {
+        return;
+    }
+
+    /* otherwise חייב להיות התאמה מדויקת */
     if (expr_type != func->type) {
-        if (!(func->type == DT_REAL && expr_type == DT_INT)) {
-            char msg[200];
-            sprintf(msg, "Semantic Error: Function '%s' returns type %s but return statement has type %s", 
-                    func_name, get_name_from_type(func->type), get_name_from_type(expr_type));
-            yyerror(msg);
-        }
+        char msg[200];
+        sprintf(msg,
+            "Semantic Error: Function '%s' returns type %s but return statement has type %s", 
+            func_name,
+            get_name_from_type(func->type),
+            get_name_from_type(expr_type));
+        yyerror(msg);
     }
 }
+
 void check_string_index(AST* index_expr) {
     if (index_expr) {
         DataType type = get_expr_type(index_expr);
@@ -569,5 +580,15 @@ void check_param_order(const char* param_name, int expected_number) {
         sprintf(error_msg, "Semantic Error: Parameter order incorrect - expected 'par%d', got '%s'", 
                 expected_number, param_name);
         yyerror(error_msg);
+    }
+}
+void add_multiple_variables(AST* id_list, DataType type) {
+    if (!id_list) return;
+
+    if (strcmp(id_list->name, "ID_LIST") == 0) {
+        add_multiple_variables(id_list->children[0], type);
+        add_multiple_variables(id_list->children[1], type);
+    } else {
+        insert_checked_variable(id_list->name, type);
     }
 }

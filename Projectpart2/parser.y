@@ -45,7 +45,7 @@
 
 %token COLON SEMICOLON COMMA LPAREN RPAREN LBRACK RBRACK BAR TYPE
 
-%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr
+%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr id_list
 %type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call
 %%
 
@@ -95,12 +95,13 @@ function:
         }
     } stmt_list {
         inside_main = 0;
+        current_function_name[0] = '\0';  
+
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              $4,
              make_node("RET", 1, $8),
              make_node("BODY", 1, $10));
-current_function_name[0] = '\0';  
     }
 
   | DEF ID LPAREN RPAREN COLON RETURNS type {
@@ -129,12 +130,13 @@ current_function_name[0] = '\0';
         }
     } stmt_list {
         inside_main = 0;
+        current_function_name[0] = '\0';  
+
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, $7),
              make_node("BODY", 1, $9));
-current_function_name[0] = '\0';  
     }
 
   | DEF ID LPAREN par_list RPAREN COLON {
@@ -163,12 +165,13 @@ current_function_name[0] = '\0';
         }
     } stmt_list {
         inside_main = 0;
+        current_function_name[0] = '\0';  
+
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              $4,
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $8));
-current_function_name[0] = '\0';  
     }
 
   | DEF ID LPAREN RPAREN COLON {
@@ -191,13 +194,14 @@ current_function_name[0] = '\0';
         }
     } stmt_list {
         inside_main = 0;
+         current_function_name[0] = '\0';  
+
         $$ = make_node("FUNCTION", 4,
              make_node($2, 0),
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $7));
 
-        current_function_name[0] = '\0';  
     }
 ;
 
@@ -349,6 +353,12 @@ assignment:
     }
 ;
 
+id_list:
+      ID                        { $$ = make_node($1, 0); }
+    | id_list COMMA ID         { $$ = make_node("", 2, $1, make_node($3, 0)); }
+;
+
+
 var_stmt:
     VAR type_decls block {
         $$ = make_node("VAR", 2, $2, $3);
@@ -432,14 +442,44 @@ type_decl:
         insert_checked_variable($4, DT_PTR_REAL);
         $$ = make_node("TYPE", 2, make_node("real*", 0), make_node($4, 0));
     }
+
+    |TYPE TYPE_INT COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_INT);
+        $$ = make_node("TYPE_MULTI", 2, make_node("int", 0), $4);
+    }
+  | TYPE TYPE_BOOL COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_BOOL);
+        $$ = make_node("TYPE_MULTI", 2, make_node("bool", 0), $4);
+    }
+  | TYPE TYPE_CHAR COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_CHAR);
+        $$ = make_node("TYPE_MULTI", 2, make_node("char", 0), $4);
+    }
+  | TYPE TYPE_REAL COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_REAL);
+        $$ = make_node("TYPE_MULTI", 2, make_node("real", 0), $4);
+    }
+  | TYPE TYPE_INT_PTR COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_PTR_INT);
+        $$ = make_node("TYPE_MULTI", 2, make_node("int*", 0), $4);
+    }
+  | TYPE TYPE_CHAR_PTR COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_PTR_CHAR);
+        $$ = make_node("TYPE_MULTI", 2, make_node("char*", 0), $4);
+    }
+  | TYPE TYPE_REAL_PTR COLON id_list SEMICOLON {
+        add_multiple_variables($4, DT_PTR_REAL);
+        $$ = make_node("TYPE_MULTI", 2, make_node("real*", 0), $4);
+    }
 ;
 
 return_stmt:
     RETURN expr SEMICOLON {
         printf("DEBUG: Processing return with value in function '%s'\n", current_function_name);
-        if (inside_main) {
-            yyerror("Semantic Error: _main_ function cannot return a value");
-        }
+        if (strcmp(current_function_name, "_main_") == 0) {
+    yyerror("Semantic Error: _main_ function cannot return a value");
+}
+
         
         check_return_type($2, current_function_name);
         
@@ -805,11 +845,28 @@ expr:
         $$ = make_node("call", 2, make_node($2, 0), $4);
     }
     | ID LPAREN call_args RPAREN {
-        Symbol* func = lookup_any_scope($1);
-        if (func && func->kind == FUNC_SYM) {
-            int expected = func->param_count;
-            int actual = count_actual_params($3);
-            if (expected == actual) {
+        /* קודם–כל: חייב להיות סימבול של פונקציה כבר בטבלה */
+        Symbol* sym = lookup_any_scope($1);
+        if (!sym) {
+            char msg[128];
+            sprintf(msg, "Semantic Error: Function '%s' called before declaration/definition", $1);
+            yyerror(msg);
+        }
+        else if (sym->kind != FUNC_SYM) {
+            char msg[128];
+            sprintf(msg, "Semantic Error: '%s' is not a function", $1);
+            yyerror(msg);
+        }
+        else {
+            /* בדיקת ארגומנטים */
+            int expected = sym->param_count;
+            int actual   = count_actual_params($3);
+          if (expected != actual) {
+                char msg[150];
+                sprintf(msg, "Semantic Error: Function '%s' expects %d args, got %d",
+                        $1, expected, actual);
+                yyerror(msg);
+            } else {
                 check_param_types($1, $3);
             }
         }

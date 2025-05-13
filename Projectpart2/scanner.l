@@ -24,8 +24,9 @@ INT_NUM [1-9][0-9]*|0
 "while"      {  return WHILE; }
 "for"        { return FOR; }
 "do"         { return DO; }
-"true"       { printf("[TRUE] "); return TRUE; }
-"false"      { printf("[FALSE] "); return FALSE; }
+"true"|"TRUE"  { yylval.sval = strdup(yytext); return TRUE; }
+"false"|"FALSE" { yylval.sval = strdup(yytext); return FALSE; }
+
 "and"        { return AND; }
 "or"         {return OR; }
 "not"        {  return NOT; }
