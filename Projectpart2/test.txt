@@ -1,18 +1,14 @@
-def foo(par1 int:i; par2 int:j; par3 int:k): returns int
-begin
-    def fee(par1 int:l; par2 char:m; par3 real:x): returns bool
-    begin
-        return TRUE;
-    end
-    return 0;
+def foo_6(): returns int 
+begin 
+if TRUE: 
+begin 
+return 0; 
+end 
 end
 
 def _main_():
 var
-    type int: a, b, c, result;
-begin 
-    a = 1;
-    b = 2;
-    c = 3;
-    result = call foo(a, b, c);
+    type int:result;
+begin
+    result = foo_6();
 end

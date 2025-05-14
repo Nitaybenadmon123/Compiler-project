@@ -65,6 +65,8 @@ DataType get_base_type(DataType ptr_type);
 int get_expected_param_number(const char* param_name);
 void check_param_order(const char* param_name, int expected_number);
 void add_multiple_variables(AST* id_list, DataType type);
+int count_params_helper(AST* node);
+void collect_param_types_recursive(AST* node, DataType* param_types, int* index);
 
 
 #endif // SYMBOL_TABLE_H

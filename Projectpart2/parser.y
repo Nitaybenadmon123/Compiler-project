@@ -229,10 +229,10 @@ par_list_item:
         insert_symbol($4, VAR_SYM, get_type_from_name($2->name));
         printf("  Inserted parameter '%s' as variable in scope %d\n", $4, current_scope);
         
-        $$ = make_node("", 3, make_node($1, 0), make_node($2->name, 0), make_node($4, 0));
+        // שינוי כאן: נשתמש בשם היררכי יותר ברור
+        $$ = make_node($1, 3, make_node($1, 0), make_node($2->name, 0), make_node($4, 0));
     }
 ;
-
 type:
     TYPE_INT   { $$ = make_node($1, 0); }
   | TYPE_CHAR  { $$ = make_node($1, 0); }
@@ -351,6 +351,10 @@ assignment:
         
         $$ = make_node("=", 2, make_node("*", 1, make_node($2, 0)), $4);
     }
+    | ADDRESS ID ASSIGN expr SEMICOLON {
+        yyerror("Semantic Error: Cannot use address operator on left side of assignment");
+        $$ = make_node("error", 2, make_node("&", 1, make_node($2, 0)), $4);
+   }
 ;
 
 id_list:
@@ -471,6 +475,16 @@ type_decl:
         add_multiple_variables($4, DT_PTR_REAL);
         $$ = make_node("TYPE_MULTI", 2, make_node("real*", 0), $4);
     }
+    | TYPE TYPE_STRING COLON id_list LBRACK NUM RBRACK SEMICOLON {
+    int size = atoi($6);
+    if (size <= 0) {
+        char error_msg[100];
+        sprintf(error_msg, "Semantic Error: String size must be a positive integer");
+        yyerror(error_msg);
+    }
+    add_multiple_variables($4, DT_STRING);
+    $$ = make_node("TYPE_STRING_ARRAY", 3, make_node("string", 0), $4, make_node($6, 0));
+}
 ;
 
 return_stmt:
@@ -876,23 +890,38 @@ expr:
     | expr OR expr { $$ = make_node("or", 2, $1, $3); }
     | NOT expr { $$ = make_node("not", 1, $2); }
 
-  | MULT ID {
-        Symbol* sym = lookup_any_scope($2);
+  | MULT expr {
+    // בדיקה אם מנסים לדרפר ביטוי שהוא לא מזהה או דירפור
+    if (!$2) {
+        yyerror("Semantic Error: Invalid dereference expression");
+        $$ = make_node("error", 0);
+    }
+    // אם זה כבר תוצאה של דירפור אחר, נדווח על שגיאה בדירפור כפול
+    else if ($2->name && strcmp($2->name, "*") == 0) {
+        yyerror("Semantic Error: Double dereference is not allowed (cannot use **ptr)");
+        $$ = make_node("error", 1, $2);
+    }
+    // אם זה מזהה רגיל, נבדוק אם זה פוינטר
+    else if ($2->name && $2->child_count == 0) {
+        Symbol* sym = lookup_any_scope($2->name);
         if (!sym) {
             char error_msg[100];
-            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2->name);
             yyerror(error_msg);
         }
-        
-        DataType type = sym->type;
-        if (!is_pointer_type(type)) {
+        else if (!is_pointer_type(sym->type)) {
             char error_msg[100];
-            sprintf(error_msg, "Semantic Error: Cannot dereference non-pointer variable '%s'", $2);
+            sprintf(error_msg, "Semantic Error: Cannot dereference non-pointer variable '%s'", $2->name);
             yyerror(error_msg);
         }
-        
-        $$ = make_node("*", 1, make_node($2, 0));
+        $$ = make_node("*", 1, $2);
     }
+    // אחרת זה ביטוי כלשהו - נדווח על שגיאה
+    else {
+        yyerror("Semantic Error: Cannot dereference non-pointer expression");
+        $$ = make_node("error", 1, $2);
+    }
+}
   | ADDRESS ID {
     Symbol* sym = lookup_any_scope($2);
     if (!sym) {
@@ -915,13 +944,33 @@ expr:
 
     $$ = make_node("&", 1, make_node($2, 0));
 }
+// הוסף את החוק הזה בחלק של expr:
+| ADDRESS ID LBRACK expr RBRACK {
+    Symbol* sym = lookup_any_scope($2);
+    if (!sym) {
+        char error_msg[100];
+        sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+        yyerror(error_msg);
+    } else if (sym->type != DT_STRING) {
+        char error_msg[100];
+        sprintf(error_msg, "Semantic Error: [] operator can only be used with string type, '%s' is of type %s", 
+                $2, get_name_from_type(sym->type));
+        yyerror(error_msg);
+    } else {
+        check_string_index($4);
+    }
+    
+    // מחזיר מצביע לתו (char*)
+    $$ = make_node("&array_access", 2, make_node($2, 0), $4);
+}
 
        
 
 %%
 
 void yyerror(const char* s) {
-    fprintf(stderr, "Syntax Error: %s\n", s);
+    extern char* yytext;
+    fprintf(stderr, "Syntax Error: %s (current token: %s)\n", s, yytext);
 }
 
 int main(int argc, char* argv[]) {

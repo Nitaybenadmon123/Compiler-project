@@ -164,18 +164,82 @@ int count_params(AST* args_node) {
     AST* list = args_node->children[0];
     if (!list || strcmp(list->name, "NONE") == 0)
         return 0;
-
-    int count = 0;
-    if (strcmp(list->name, "") == 0) {
-        for (int i = 0; i < list->child_count; i++) {
-            if (list->children[i])
-                count++;
-        }
-    } else {
-        count = 1;
+    
+    printf("DEBUG: Parameter list node name: '%s', child_count: %d\n", 
+           list->name ? list->name : "(null)", list->child_count);
+    
+    // מקרה מיוחד לפרמטר בודד
+    if (list->name && strncmp(list->name, "par", 3) == 0) {
+        printf("DEBUG: Single parameter case detected: %s\n", list->name);
+        return 1;
     }
 
-    return count;
+    // אם זה צומת ריק עם ילד אחד, ייתכן שזה פרמטר בודד במבנה אחר
+    if (strcmp(list->name, "") == 0 && list->child_count == 1) {
+        printf("DEBUG: Empty node with one child - likely single parameter\n");
+        return 1;
+    }
+
+    // המקרה המורכב: רשימת פרמטרים
+    if (strcmp(list->name, "") == 0) {
+        // נבדוק אם זה מבנה עם שרשור רקורסיבי (ילד ראשון הוא המשך הרשימה, ילד שני הוא פרמטר)
+        if (list->child_count == 2) {
+            // אם הילד הראשון הוא צומת ריק, זה כנראה רשימה משורשרת
+            int count = 0;
+            AST* current = list;
+            
+            while (current && strcmp(current->name, "") == 0 && current->child_count == 2) {
+                count++;  // סופרים את הפרמטר הנוכחי (הילד השני)
+                current = current->children[0];  // ממשיכים עם הילד הראשון (המשך הרשימה)
+            }
+            
+            // אם נשאר עוד צומת לא ריק, זה כנראה הפרמטר האחרון
+            if (current && current->child_count > 0) {
+                count++;
+            }
+            
+            printf("DEBUG: Recursive list structure detected with %d parameters\n", count);
+            return count;
+        }
+        // אם לא זיהינו את המבנה הרקורסיבי, ננסה לספור את כל הילדים
+        else {
+            int count = 0;
+            for (int i = 0; i < list->child_count; i++) {
+                if (list->children[i]) {
+                    count++;
+                    printf("DEBUG: Counted child %d\n", i);
+                }
+            }
+            printf("DEBUG: Flat list structure detected with %d parameters\n", count);
+            return count;
+        }
+    }
+    
+    // מקרה ברירת המחדל - אם לא זיהינו את המבנה, נניח שזה פרמטר אחד
+    printf("DEBUG: Defaulting to 1 parameter\n");
+    return 1;
+}
+
+// פונקציית עזר שסופרת פרמטרים נוספת שצריך להוסיף
+int count_params_helper(AST* node) {
+    if (!node) return 0;
+    
+    // אם זה פרמטר בודד
+    if (strcmp(node->name, "") != 0) {
+        return 1;
+    }
+    
+    // אם זה צומת עם שני ילדים (פרמטר נוסף ברשימה)
+    if (node->child_count == 2) {
+        return 1 + count_params_helper(node->children[0]);
+    }
+    
+    // אם זה צומת עם שלושה ילדים (פרמטר מלא)
+    if (node->child_count == 3) {
+        return 1;
+    }
+    
+    return 0;
 }
 
 int count_actual_params(AST* args_node) {
@@ -186,24 +250,27 @@ int count_actual_params(AST* args_node) {
     if (!par_node || strcmp(par_node->name, "none") == 0)
         return 0;
 
-    int count = 0;
-    AST* current = par_node;
-
-    while (current && strcmp(current->name, "par") == 0) {
-        if (current->child_count == 2) {
-            count++;
-            current = current->children[0];
-        } else if (current->child_count == 1) {
-            count++;
-            break;
-        } else {
-            break;
-        }
-    }
-
-    return count;
+    // נטפל בצורה רקורסיבית במבנה ה-AST של פרמטרים של קריאת פונקציה
+    return count_actual_params_recursive(par_node);
 }
 
+// פונקציית עזר רקורסיבית לספירת פרמטרים בקריאת פונקציה
+int count_actual_params_recursive(AST* node) {
+    if (!node) return 0;
+    
+    // אם מדובר בצומת 'par' עם שני ילדים (פרמטר נוכחי + שאר הפרמטרים)
+    if (strcmp(node->name, "par") == 0 && node->child_count == 2) {
+        return 1 + count_actual_params_recursive(node->children[0]);
+    }
+    
+    // אם מדובר בצומת 'par' עם ילד אחד (פרמטר בודד בסוף)
+    if (strcmp(node->name, "par") == 0 && node->child_count == 1) {
+        return 1;
+    }
+    
+    // אם זה פרמטר בודד בלי המבנה 'par'
+    return 1;
+}
 void insert_function_with_param_types(char* name, DataType type, int param_count, DataType* param_types) {
     Symbol* new_sym = malloc(sizeof(Symbol));
     new_sym->name = strdup(name);
@@ -231,26 +298,150 @@ void insert_function_with_param_types(char* name, DataType type, int param_count
     }
 }
 
-
 void collect_param_types(AST* par_list, DataType* param_types) {
     if (!par_list || strcmp(par_list->name, "ARGS") != 0 || par_list->child_count == 0)
         return;
     
-    AST* param_list = par_list->children[0];
-    if (!param_list || strcmp(param_list->name, "NONE") == 0)
+    AST* list = par_list->children[0];
+    if (!list || strcmp(list->name, "NONE") == 0)
         return;
     
-    int param_index = 0;
+    printf("DEBUG: Collecting param types, list node: '%s', child_count: %d\n", 
+           list->name ? list->name : "(null)", list->child_count);
     
-    for (int i = 0; i < param_list->child_count; i++) {
-        AST* param_item = param_list->children[i];
-        if (param_item && param_item->child_count >= 2) {
-            AST* type_node = param_item->children[1];
-            if (type_node) {
-                param_types[param_index++] = get_type_from_name(type_node->name);
-                printf("DEBUG: Collected parameter type %s at index %d\n", 
-                       type_node->name, param_index-1);
+    // מקרה מיוחד לפרמטר בודד
+    if (list->name && strncmp(list->name, "par", 3) == 0) {
+        if (list->child_count >= 2 && list->children[1]) {
+            param_types[0] = get_type_from_name(list->children[1]->name);
+            printf("DEBUG: Collected single parameter type: %s\n", 
+                   get_name_from_type(param_types[0]));
+        }
+        return;
+    }
+    
+    // מקרה של רשימת פרמטרים: נשתמש במערך זמני לאיסוף ואז נהפוך את הסדר
+    if (strcmp(list->name, "") == 0) {
+        // בדיקה למבנה רקורסיבי (ילד ראשון הוא המשך הרשימה, ילד שני הוא פרמטר)
+        if (list->child_count == 2) {
+            // שלב 1: נספור כמה פרמטרים יש סה"כ
+            int param_count = count_params(par_list);
+            printf("DEBUG: Total parameters to collect: %d\n", param_count);
+            
+            // שלב 2: נאסוף את הטיפוסים למערך זמני
+            DataType temp_types[MAX_PARAMS];
+            int param_index = 0;
+            AST* current = list;
+            
+            while (current && strcmp(current->name, "") == 0 && current->child_count == 2) {
+                // נקבל את הטיפוס מהילד השני
+                AST* param_node = current->children[1];
+                if (param_node && param_node->child_count >= 2) {
+                    temp_types[param_index++] = get_type_from_name(param_node->children[1]->name);
+                    printf("DEBUG: Collected parameter type %s at index %d\n", 
+                           get_name_from_type(temp_types[param_index-1]), param_index-1);
+                }
+                
+                // נמשיך עם הילד הראשון
+                current = current->children[0];
             }
+            
+            // אם נשאר עוד צומת, זה כנראה הפרמטר האחרון
+            if (current && current->child_count >= 2) {
+                temp_types[param_index++] = get_type_from_name(current->children[1]->name);
+                printf("DEBUG: Collected final parameter type %s at index %d\n", 
+                       get_name_from_type(temp_types[param_index-1]), param_index-1);
+            }
+            
+            // שלב 3: נהפוך את הסדר למערך התוצאה
+            for (int i = 0; i < param_index; i++) {
+                int reversed_index = param_index - 1 - i;
+                param_types[i] = temp_types[reversed_index];
+                printf("DEBUG: Reversed: param %d (%s) -> param %d\n", 
+                       reversed_index, get_name_from_type(param_types[i]), i);
+            }
+            
+            return;
+        }
+        
+        // אם זה לא מבנה רקורסיבי, ננסה גישה אחרת
+        printf("DEBUG: Non-recursive list structure, trying alternative approach\n");
+        
+        // נאסוף את הטיפוסים בצורה רקורסיבית למערך זמני
+        DataType temp_types[MAX_PARAMS];
+        int param_index = 0;
+        collect_param_types_recursive(list, temp_types, &param_index);
+        
+        // נהפוך את הסדר
+        for (int i = 0; i < param_index; i++) {
+            int reversed_index = param_index - 1 - i;
+            param_types[i] = temp_types[reversed_index];
+            printf("DEBUG: Reversed with recursive: param %d (%s) -> param %d\n", 
+                   reversed_index, get_name_from_type(param_types[i]), i);
+        }
+        
+        return;
+    }
+    
+    // אם לא זיהינו מבנה מוכר, ננסה באופן כללי
+    printf("DEBUG: Using general approach to collect parameter types\n");
+    
+    // נאסוף את הטיפוסים בצורה רקורסיבית למערך זמני
+    DataType temp_types[MAX_PARAMS];
+    int param_index = 0;
+    collect_param_types_recursive(list, temp_types, &param_index);
+    
+    // נהפוך את הסדר
+    for (int i = 0; i < param_index; i++) {
+        int reversed_index = param_index - 1 - i;
+        param_types[i] = temp_types[reversed_index];
+        printf("DEBUG: General reverse: param %d (%s) -> param %d\n", 
+               reversed_index, get_name_from_type(param_types[i]), i);
+    }
+}
+
+// פונקציית עזר רקורסיבית - נשאר בלי שינוי
+void collect_param_types_recursive(AST* node, DataType* param_types, int* index) {
+    if (!node) return;
+    
+    printf("DEBUG: Recursive type extraction from node '%s' with %d children\n", 
+           node->name ? node->name : "(null)", node->child_count);
+    
+    // אם זה פרמטר בודד
+    if (node->name && strncmp(node->name, "par", 3) == 0 && node->child_count >= 2) {
+        param_types[(*index)++] = get_type_from_name(node->children[1]->name);
+        printf("DEBUG: Extracted type %s at index %d\n", 
+               get_name_from_type(param_types[(*index)-1]), (*index)-1);
+        return;
+    }
+    
+    // אם זה צומת ריק עם שני ילדים (רשימה)
+    if (strcmp(node->name, "") == 0 && node->child_count == 2) {
+        // טיפול רקורסיבי בילד השמאלי (המשך רשימת הפרמטרים)
+        collect_param_types_recursive(node->children[0], param_types, index);
+        
+        // טיפול בילד הימני (הפרמטר הנוכחי)
+        AST* param_node = node->children[1];
+        if (param_node) {
+            if (strncmp(param_node->name, "par", 3) == 0 && param_node->child_count >= 2) {
+                param_types[(*index)++] = get_type_from_name(param_node->children[1]->name);
+                printf("DEBUG: Extracted type %s at index %d from right child\n", 
+                       get_name_from_type(param_types[(*index)-1]), (*index)-1);
+            }
+            else {
+                collect_param_types_recursive(param_node, param_types, index);
+            }
+        }
+    }
+    // בדיקה אם זה פרמטר רגיל (par3, int, k)
+    else if (node->child_count == 3) {
+        param_types[(*index)++] = get_type_from_name(node->children[1]->name);
+        printf("DEBUG: Extracted type %s at index %d from 3-child node\n", 
+               get_name_from_type(param_types[(*index)-1]), (*index)-1);
+    }
+    // בכל מקרה אחר, ננסה לעבור על כל הילדים
+    else {
+        for (int i = 0; i < node->child_count; i++) {
+            collect_param_types_recursive(node->children[i], param_types, index);
         }
     }
 }
@@ -334,8 +525,9 @@ DataType get_expr_type(AST* expr) {
     if (expr->name && expr->name[0] == '"')
         return DT_STRING;
     
-    if (expr->name && (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1]))))
-        return DT_INT;
+        if (expr->name && (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0 ||
+        strcmp(expr->name, "TRUE") == 0 || strcmp(expr->name, "FALSE") == 0))
+        return DT_BOOL;
     
     if (expr->name && (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0))
         return DT_BOOL;
@@ -392,6 +584,26 @@ DataType get_expr_type(AST* expr) {
                 return DT_INT;
         }
     }
+    if (expr->name) {
+        // אם זה מספר (ספרה או מינוס ואז ספרה)
+        if (isdigit(expr->name[0]) || (expr->name[0] == '-' && expr->name[1] && isdigit(expr->name[1]))) {
+            // נבדוק אם יש נקודה עשרונית - אז זה מספר ממשי
+            for (int i = 0; expr->name[i]; i++) {
+                if (expr->name[i] == '.') {
+                    return DT_REAL;
+                }
+            }
+            return DT_INT;  // אחרת זה מספר שלם
+        }
+    }
+    // הוסף את התנאי הזה בפונקציה get_expr_type:
+if (expr->name && strcmp(expr->name, "&array_access") == 0 && expr->child_count == 2) {
+    Symbol* sym = lookup_any_scope(expr->children[0]->name);
+    if (sym && sym->type == DT_STRING) {
+        return DT_PTR_CHAR; // כתובת של תו במחרוזת היא מצביע לתו
+    }
+    return DT_VOID; // מקרה שגיאה
+}
     
     return DT_INT;
 }
@@ -453,20 +665,24 @@ void get_call_param_types_recursive(AST* node, DataType* types, int* index) {
     
     if (strcmp(node->name, "par") == 0) {
         if (node->child_count == 1) {
+            // פרמטר בודד בסוף
             types[(*index)++] = get_expr_type(node->children[0]);
             printf("DEBUG: Extracted single parameter of type %s\n", 
                    get_name_from_type(types[(*index)-1]));
         } 
         else if (node->child_count == 2) {
-            
+            // פרמטר + המשך רשימה
+            // ראשית מטפלים ברקורסיה בשאר הרשימה
             get_call_param_types_recursive(node->children[0], types, index);
             
+            // ואז מטפלים בפרמטר הנוכחי
             types[(*index)++] = get_expr_type(node->children[1]);
             printf("DEBUG: Extracted parameter of type %s\n", 
                    get_name_from_type(types[(*index)-1]));
         }
     } 
     else {
+        // פרמטר בודד ללא מבנה "par"
         types[(*index)++] = get_expr_type(node);
         printf("DEBUG: Extracted direct parameter of type %s\n", 
                get_name_from_type(types[(*index)-1]));
@@ -490,7 +706,11 @@ void check_return_type(AST* expr, const char* func_name) {
         return;
     }
     
-    /* empty return (“return;”) */
+    // הדפסת דיבוג מפורטת על ה-AST של הביטוי המוחזר
+    printf("DEBUG: Return expression details - name: '%s', child_count: %d\n", 
+           expr ? expr->name : "NULL", expr ? expr->child_count : 0);
+    
+    /* empty return ("return;") */
     if (expr && strcmp(expr->name, "NONE") == 0) {
         if (func->type != DT_VOID) {
             char msg[200];
@@ -511,8 +731,14 @@ void check_return_type(AST* expr, const char* func_name) {
     }
     
     DataType expr_type = get_expr_type(expr);
-    printf("DEBUG: Function '%s' returns type %s, expression has type %s\n", 
-            func_name, get_name_from_type(func->type), get_name_from_type(expr_type));
+    printf("DEBUG: Function '%s' returns type %s, expression has type %s, expression name: '%s'\n", 
+            func_name, get_name_from_type(func->type), get_name_from_type(expr_type), 
+            expr ? expr->name : "NULL");
+    
+    /* מקרים מיוחדים: TRUE/FALSE בוליאניים */
+    if (func->type == DT_BOOL && expr && (strcmp(expr->name, "TRUE") == 0 || strcmp(expr->name, "FALSE") == 0)) {
+        return;  // זה תקין - ערך בוליאני מוחזר לפונקציה בוליאנית
+    }
     
     /* allow implicit conversions: int→real and int→bool */
     if ((func->type == DT_REAL && expr_type == DT_INT) ||
@@ -531,7 +757,6 @@ void check_return_type(AST* expr, const char* func_name) {
         yyerror(msg);
     }
 }
-
 void check_string_index(AST* index_expr) {
     if (index_expr) {
         DataType type = get_expr_type(index_expr);
@@ -585,9 +810,11 @@ void check_param_order(const char* param_name, int expected_number) {
 void add_multiple_variables(AST* id_list, DataType type) {
     if (!id_list) return;
 
-    if (strcmp(id_list->name, "ID_LIST") == 0) {
+    if (strcmp(id_list->name, "") == 0 && id_list->child_count == 2) {
         add_multiple_variables(id_list->children[0], type);
-        add_multiple_variables(id_list->children[1], type);
+        if (id_list->children[1] && id_list->children[1]->name) {
+            insert_checked_variable(id_list->children[1]->name, type);
+        }
     } else {
         insert_checked_variable(id_list->name, type);
     }
