@@ -1,0 +1,3 @@
+def fee(par1 a): begin end #-> no type defined <-#
+def foo(par1 int:i, par2 int:j): begin end #-> parameters must be
+separated by semicolon <-#

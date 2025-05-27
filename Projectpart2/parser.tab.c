@@ -1724,7 +1724,7 @@ yyreduce:
         insert_symbol((yyvsp[0].sval), VAR_SYM, get_type_from_name((yyvsp[-2].ast)->name));
         printf("  Inserted parameter '%s' as variable in scope %d\n", (yyvsp[0].sval), current_scope);
         
-        // שינוי כאן: נשתמש בשם היררכי יותר ברור
+    
         (yyval.ast) = make_node((yyvsp[-3].sval), 3, make_node((yyvsp[-3].sval), 0), make_node((yyvsp[-2].ast)->name, 0), make_node((yyvsp[0].sval), 0));
     }
 #line 1731 "parser.tab.c"
@@ -2749,7 +2749,7 @@ yyreduce:
   case 127: /* expr: ID LPAREN call_args RPAREN  */
 #line 861 "parser.y"
                                  {
-        /* קודם–כל: חייב להיות סימבול של פונקציה כבר בטבלה */
+        
         Symbol* sym = lookup_any_scope((yyvsp[-3].sval));
         if (!sym) {
             char msg[128];
@@ -2762,7 +2762,7 @@ yyreduce:
             yyerror(msg);
         }
         else {
-            /* בדיקת ארגומנטים */
+         
             int expected = sym->param_count;
             int actual   = count_actual_params((yyvsp[-1].ast));
           if (expected != actual) {
@@ -2800,17 +2800,17 @@ yyreduce:
   case 131: /* expr: MULT expr  */
 #line 893 "parser.y"
               {
-    // בדיקה אם מנסים לדרפר ביטוי שהוא לא מזהה או דירפור
+  
     if (!(yyvsp[0].ast)) {
         yyerror("Semantic Error: Invalid dereference expression");
         (yyval.ast) = make_node("error", 0);
     }
-    // אם זה כבר תוצאה של דירפור אחר, נדווח על שגיאה בדירפור כפול
+   
     else if ((yyvsp[0].ast)->name && strcmp((yyvsp[0].ast)->name, "*") == 0) {
         yyerror("Semantic Error: Double dereference is not allowed (cannot use **ptr)");
         (yyval.ast) = make_node("error", 1, (yyvsp[0].ast));
     }
-    // אם זה מזהה רגיל, נבדוק אם זה פוינטר
+    
     else if ((yyvsp[0].ast)->name && (yyvsp[0].ast)->child_count == 0) {
         Symbol* sym = lookup_any_scope((yyvsp[0].ast)->name);
         if (!sym) {
@@ -2825,7 +2825,7 @@ yyreduce:
         }
         (yyval.ast) = make_node("*", 1, (yyvsp[0].ast));
     }
-    // אחרת זה ביטוי כלשהו - נדווח על שגיאה
+   
     else {
         yyerror("Semantic Error: Cannot dereference non-pointer expression");
         (yyval.ast) = make_node("error", 1, (yyvsp[0].ast));
@@ -2878,7 +2878,7 @@ yyreduce:
         check_string_index((yyvsp[-1].ast));
     }
     
-    // מחזיר מצביע לתו (char*)
+    
     (yyval.ast) = make_node("&array_access", 2, make_node((yyvsp[-3].sval), 0), (yyvsp[-1].ast));
 }
 #line 2885 "parser.tab.c"

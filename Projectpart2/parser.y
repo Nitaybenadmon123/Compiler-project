@@ -229,7 +229,7 @@ par_list_item:
         insert_symbol($4, VAR_SYM, get_type_from_name($2->name));
         printf("  Inserted parameter '%s' as variable in scope %d\n", $4, current_scope);
         
-        // שינוי כאן: נשתמש בשם היררכי יותר ברור
+    
         $$ = make_node($1, 3, make_node($1, 0), make_node($2->name, 0), make_node($4, 0));
     }
 ;
@@ -859,7 +859,7 @@ expr:
         $$ = make_node("call", 2, make_node($2, 0), $4);
     }
     | ID LPAREN call_args RPAREN {
-        /* קודם–כל: חייב להיות סימבול של פונקציה כבר בטבלה */
+        
         Symbol* sym = lookup_any_scope($1);
         if (!sym) {
             char msg[128];
@@ -872,7 +872,7 @@ expr:
             yyerror(msg);
         }
         else {
-            /* בדיקת ארגומנטים */
+         
             int expected = sym->param_count;
             int actual   = count_actual_params($3);
           if (expected != actual) {
@@ -891,17 +891,17 @@ expr:
     | NOT expr { $$ = make_node("not", 1, $2); }
 
   | MULT expr {
-    // בדיקה אם מנסים לדרפר ביטוי שהוא לא מזהה או דירפור
+  
     if (!$2) {
         yyerror("Semantic Error: Invalid dereference expression");
         $$ = make_node("error", 0);
     }
-    // אם זה כבר תוצאה של דירפור אחר, נדווח על שגיאה בדירפור כפול
+   
     else if ($2->name && strcmp($2->name, "*") == 0) {
         yyerror("Semantic Error: Double dereference is not allowed (cannot use **ptr)");
         $$ = make_node("error", 1, $2);
     }
-    // אם זה מזהה רגיל, נבדוק אם זה פוינטר
+    
     else if ($2->name && $2->child_count == 0) {
         Symbol* sym = lookup_any_scope($2->name);
         if (!sym) {
@@ -916,7 +916,7 @@ expr:
         }
         $$ = make_node("*", 1, $2);
     }
-    // אחרת זה ביטוי כלשהו - נדווח על שגיאה
+   
     else {
         yyerror("Semantic Error: Cannot dereference non-pointer expression");
         $$ = make_node("error", 1, $2);
@@ -944,7 +944,7 @@ expr:
 
     $$ = make_node("&", 1, make_node($2, 0));
 }
-// הוסף את החוק הזה בחלק של expr:
+
 | ADDRESS ID LBRACK expr RBRACK {
     Symbol* sym = lookup_any_scope($2);
     if (!sym) {
@@ -960,7 +960,7 @@ expr:
         check_string_index($4);
     }
     
-    // מחזיר מצביע לתו (char*)
+    
     $$ = make_node("&array_access", 2, make_node($2, 0), $4);
 }
 
