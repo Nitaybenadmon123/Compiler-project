@@ -145,17 +145,26 @@ void insert_checked_variable(const char* name, DataType type) {
     }
 }
 
+// גרסה דומה ל־insert_checked_variable עבור פונקציות
 void insert_function_symbol(char* name, DataType type, int param_count) {
-    Symbol* new_sym = malloc(sizeof(Symbol));
-    new_sym->name = strdup(name);
-    new_sym->kind = FUNC_SYM;
-    new_sym->type = type;
-    new_sym->param_count = param_count;
-    new_sym->next = symbol_stack[current_scope]->head;
-    symbol_stack[current_scope]->head = new_sym;
-    printf("  Inserted function '%s' with %d parameters in scope %d\n", 
-           name, param_count, current_scope);
-}
+        // קודם בודקים כפילות באותו סקופ בלבד
+       if (symbol_exists_in_current_scope(name)) {
+            char err[128];
+            sprintf(err, "Semantic Error: Function '%s' already defined in this block", name);
+           yyerror(err);
+            return;
+        }
+       // אם אין כפילות, מוסיפים
+        Symbol* new_sym = malloc(sizeof(Symbol));
+        new_sym->name = strdup(name);
+        new_sym->kind = FUNC_SYM;
+        new_sym->type = type;
+        new_sym->param_count = param_count;
+        new_sym->next = symbol_stack[current_scope]->head;
+        symbol_stack[current_scope]->head = new_sym;
+        printf("  Inserted function '%s' with %d parameters in scope %d\n",
+               name, param_count, current_scope);
+    }
 
 int count_params(AST* args_node) {
     if (!args_node || args_node->child_count == 0)
@@ -272,6 +281,14 @@ int count_actual_params_recursive(AST* node) {
     return 1;
 }
 void insert_function_with_param_types(char* name, DataType type, int param_count, DataType* param_types) {
+
+    if (symbol_exists_in_current_scope(name)) {
+        char err[128];
+        sprintf(err, "Semantic Error: Function '%s' already defined in this block", name);
+        yyerror(err);
+        return;
+    }
+
     Symbol* new_sym = malloc(sizeof(Symbol));
     new_sym->name = strdup(name);
     new_sym->kind = FUNC_SYM;
@@ -819,3 +836,39 @@ void add_multiple_variables(AST* id_list, DataType type) {
         insert_checked_variable(id_list->name, type);
     }
 }
+void add_multiple_variables_with_values(AST* list, DataType type) {
+    if (!list) return;
+
+    if (strcmp(list->name, "") == 0 && list->child_count == 2) {
+        add_multiple_variables_with_values(list->children[0], type);
+
+        AST* id_with_value = list->children[1];
+        if (id_with_value && id_with_value->name && id_with_value->child_count == 1) {
+            const char* name = id_with_value->name;
+            const char* value = id_with_value->children[0]->name;
+            insert_checked_variable_with_value(name, type, value);
+        }
+    } else if (list->name && list->child_count == 1) {
+        const char* name = list->name;
+        const char* value = list->children[0]->name;
+        insert_checked_variable_with_value(name, type, value);
+    }
+}
+void insert_checked_variable_with_value(const char* name, DataType type, const char* value) {
+    if (symbol_exists_in_current_scope(name)) {
+        char error_msg[100];
+        sprintf(error_msg, "Semantic Error: Var '%s' already defined in this block", name);
+        yyerror(error_msg);
+    } else {
+        Symbol* new_sym = malloc(sizeof(Symbol));
+        new_sym->name = strdup(name);
+        new_sym->kind = VAR_SYM;
+        new_sym->type = type;
+        new_sym->param_count = 0;
+        // אם תרצה – אפשר לשמור גם את הערך ב־Symbol struct, לפי הצורך
+        new_sym->next = symbol_stack[current_scope]->head;
+        symbol_stack[current_scope]->head = new_sym;
+        printf("  Inserted '%s' with value '%s' as var in scope %d\n", name, value, current_scope);
+    }
+}
+

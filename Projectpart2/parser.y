@@ -45,8 +45,10 @@
 
 %token COLON SEMICOLON COMMA LPAREN RPAREN LBRACK RBRACK BAR TYPE
 
-%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr id_list
-%type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call
+%type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr id_list id_value_list 
+%type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call 
+%type <ast> literal
+
 %%
 
 program:
@@ -93,7 +95,9 @@ function:
         if (get_type_from_name($8->name) == DT_STRING) {
             yyerror("Semantic Error: Function cannot return string type");
         }
+        //enter_scope();
     } stmt_list {
+         //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
 
@@ -128,7 +132,9 @@ function:
         if (get_type_from_name($7->name) == DT_STRING) {
             yyerror("Semantic Error: Function cannot return string type");
         }
+        //enter_scope();
     } stmt_list {
+         //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
 
@@ -163,7 +169,9 @@ function:
             if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0)
                 yyerror("Semantic Error: _main_ function cannot take arguments");
         }
+        //enter_scope();
     } stmt_list {
+         //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
 
@@ -192,7 +200,9 @@ function:
             main_defined = 1;
             inside_main = 1;
         }
+       // enter_scope();
     } stmt_list {
+        // exit_scope();
         inside_main = 0;
          current_function_name[0] = '\0';  
 
@@ -230,7 +240,9 @@ par_list_item:
         printf("  Inserted parameter '%s' as variable in scope %d\n", $4, current_scope);
         
     
-        $$ = make_node($1, 3, make_node($1, 0), make_node($2->name, 0), make_node($4, 0));
+              $$ = make_node($1, 2,
+          make_node($2->name, 0),
+            make_node($4,      0));
     }
 ;
 type:
@@ -475,16 +487,58 @@ type_decl:
         add_multiple_variables($4, DT_PTR_REAL);
         $$ = make_node("TYPE_MULTI", 2, make_node("real*", 0), $4);
     }
-    | TYPE TYPE_STRING COLON id_list LBRACK NUM RBRACK SEMICOLON {
-    int size = atoi($6);
-    if (size <= 0) {
-        char error_msg[100];
-        sprintf(error_msg, "Semantic Error: String size must be a positive integer");
-        yyerror(error_msg);
+    | TYPE TYPE_STRING id_list LBRACK NUM RBRACK SEMICOLON {
+        int size = atoi($5);
+        if (size <= 0) {
+           yyerror("Semantic Error: String size must be a positive integer");
+       }
+        /* רישום משתנים */
+        add_multiple_variables($3, DT_STRING);
+        /* יצירת AST: שם הצומת, מספר ילדים, טיפוס, רשימת מזהים, גודל */
+        $$ = make_node("TYPE_STRING_ARRAY", 3,
+                      make_node("string", 0),
+                       $3,
+                       make_node($5, 0));
     }
-    add_multiple_variables($4, DT_STRING);
-    $$ = make_node("TYPE_STRING_ARRAY", 3, make_node("string", 0), $4, make_node($6, 0));
+| TYPE TYPE_BOOL COLON id_value_list SEMICOLON {
+    add_multiple_variables_with_values($4, DT_BOOL);
+    $$ = make_node("TYPE_MULTI_INIT", 2, make_node("bool", 0), $4);
 }
+| TYPE TYPE_INT COLON id_value_list SEMICOLON {
+    add_multiple_variables_with_values($4, DT_INT);
+    $$ = make_node("TYPE_MULTI_INIT", 2, make_node("int", 0), $4);
+}
+| TYPE TYPE_CHAR COLON id_value_list SEMICOLON {
+    add_multiple_variables_with_values($4, DT_CHAR);
+    $$ = make_node("TYPE_MULTI_INIT", 2, make_node("char", 0), $4);
+}
+| TYPE TYPE_STRING COLON id_value_list SEMICOLON {
+    add_multiple_variables_with_values($4, DT_STRING);
+    $$ = make_node("TYPE_MULTI_INIT", 2, make_node("string", 0), $4);
+}
+| TYPE TYPE_REAL COLON id_value_list SEMICOLON {
+    add_multiple_variables_with_values($4, DT_REAL);
+    $$ = make_node("TYPE_MULTI_INIT", 2, make_node("real", 0), $4);
+}
+
+;
+id_value_list:
+      ID COLON literal {
+          $$ = make_node($1, 1, $3);  // $3 כבר AST
+      }
+    | id_value_list COMMA ID COLON literal {
+          $$ = make_node("", 2, $1, make_node($3, 1, $5));
+      }
+;
+
+
+literal:
+   NUM            { $$ = make_node($1, 0); }
+|TRUE           { $$ = make_node("true", 0); }
+|FALSE          { $$ = make_node("false", 0); }
+|CHAR_LITERAL   { $$ = make_node($1, 0); }
+|STRING_LITERAL { $$ = make_node($1, 0); }
+
 ;
 
 return_stmt:

@@ -36,6 +36,7 @@ extern int preserve_symbol_tables;
 
 void enter_scope();
 void exit_scope();
+int count_actual_params_recursive(AST* par_node);
 void insert_symbol(char* name, SymbolKind kind, DataType type);
 Symbol* lookup_symbol(const char* name);
 int symbol_exists_in_current_scope(const char* name);
@@ -67,6 +68,11 @@ void check_param_order(const char* param_name, int expected_number);
 void add_multiple_variables(AST* id_list, DataType type);
 int count_params_helper(AST* node);
 void collect_param_types_recursive(AST* node, DataType* param_types, int* index);
+void add_multiple_variables_with_values(AST* list, DataType type);
+void insert_checked_variable_with_value(const char* name, DataType type, const char* value);
+
+
+
 
 
 #endif // SYMBOL_TABLE_H

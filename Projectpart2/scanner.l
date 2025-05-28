@@ -15,6 +15,8 @@ REAL_NUM [-+]?([0-9]*[.])?[0-9]+([eE][-+]?[0-9]+)?
 INT_NUM [1-9][0-9]*|0
 
 %%
+"#->"([^<]|\n)*"<-#"    { /* ignore comment */ }
+    
 "def"        {  return DEF; }
 "begin"      {  return T_BEGIN; }
 "end"        { return T_END; }
