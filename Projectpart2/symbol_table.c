@@ -320,7 +320,6 @@ void insert_function_with_param_types(char* name, DataType type, int param_count
         printf("\n");
     }
 }
-
 void collect_param_types(AST* par_list, DataType* param_types) {
     if (!par_list || strcmp(par_list->name, "ARGS") != 0 || par_list->child_count == 0)
         return;
@@ -329,170 +328,72 @@ void collect_param_types(AST* par_list, DataType* param_types) {
     if (!list || strcmp(list->name, "NONE") == 0)
         return;
     
+    printf("DEBUG: ===== DEBUGGING PARAMETER AST STRUCTURE =====\n");
+    debug_param_ast(par_list, 0);
+    printf("DEBUG: ===============================================\n");
+    
     printf("DEBUG: Collecting param types, list node: '%s', child_count: %d\n", 
            list->name ? list->name : "(null)", list->child_count);
     
-
+    // Handle single parameter case
     if (list->name && strncmp(list->name, "par", 3) == 0) {
-        if (list->child_count >= 2 && list->children[1]) {
-            param_types[0] = get_type_from_name(list->children[1]->name);
+        if (list->child_count >= 2 && list->children[0]) {
+            param_types[0] = get_type_from_name(list->children[0]->name);
             printf("DEBUG: Collected single parameter type: %s\n", 
                    get_name_from_type(param_types[0]));
         }
         return;
     }
     
-
+    // Handle multiple parameters
     if (strcmp(list->name, "") == 0) {
-
-        if (list->child_count == 2) {
-
-            int param_count = count_params(par_list);
-            printf("DEBUG: Total parameters to collect: %d\n", param_count);
-            
-
-            DataType temp_types[MAX_PARAMS];
-            int param_index = 0;
-            AST* current = list;
-            
-            while (current && strcmp(current->name, "") == 0 && current->child_count == 2) {
-
-                AST* param_node = current->children[1];
-                if (param_node && param_node->child_count >= 2) {
-                    temp_types[param_index++] = get_type_from_name(param_node->children[1]->name);
-                    printf("DEBUG: Collected parameter type %s at index %d\n", 
-                           get_name_from_type(temp_types[param_index-1]), param_index-1);
-                }
-                
-
-                current = current->children[0];
-            }
-            
-
-            if (current && current->child_count >= 2) {
-                temp_types[param_index++] = get_type_from_name(current->children[1]->name);
-                printf("DEBUG: Collected final parameter type %s at index %d\n", 
-                       get_name_from_type(temp_types[param_index-1]), param_index-1);
-            }
-            
-
-            for (int i = 0; i < param_index; i++) {
-                int reversed_index = param_index - 1 - i;
-                param_types[i] = temp_types[reversed_index];
-                printf("DEBUG: Reversed: param %d (%s) -> param %d\n", 
-                       reversed_index, get_name_from_type(param_types[i]), i);
-            }
-            
-            return;
-        }
+        printf("DEBUG: Multiple parameters detected\n");
         
-
-        printf("DEBUG: Non-recursive list structure, trying alternative approach\n");
-        
-
-        DataType temp_types[MAX_PARAMS];
-        int param_index = 0;
-        collect_param_types_recursive(list, temp_types, &param_index);
-        
-
-        for (int i = 0; i < param_index; i++) {
-            int reversed_index = param_index - 1 - i;
-            param_types[i] = temp_types[reversed_index];
-            printf("DEBUG: Reversed with recursive: param %d (%s) -> param %d\n", 
-                   reversed_index, get_name_from_type(param_types[i]), i);
-        }
-        
+        collect_param_types_recursive(list, param_types, 0);  // Pass param_types directly
         return;
     }
     
-
-    printf("DEBUG: Using general approach to collect parameter types\n");
-    
-
-    DataType temp_types[MAX_PARAMS];
-    int param_index = 0;
-    collect_param_types_recursive(list, temp_types, &param_index);
-    
-
-    for (int i = 0; i < param_index; i++) {
-        int reversed_index = param_index - 1 - i;
-        param_types[i] = temp_types[reversed_index];
-        printf("DEBUG: General reverse: param %d (%s) -> param %d\n", 
-               reversed_index, get_name_from_type(param_types[i]), i);
-    }
+    printf("DEBUG: Using fallback approach\n");
+    collect_param_types_recursive(list, param_types, 0);
 }
 
-
-void collect_param_types_recursive(AST* node, DataType* param_types, int* index) {
+// Update the recursive function to use correct indexing:
+void collect_param_types_recursive(AST* node, DataType* param_types, int depth) {
     if (!node) return;
     
-    printf("DEBUG: Recursive type extraction from node '%s' with %d children\n", 
-           node->name ? node->name : "(null)", node->child_count);
+    printf("DEBUG: Recursive type extraction from node '%s' with %d children (depth=%d)\n", 
+           node->name ? node->name : "(null)", node->child_count, depth);
     
-
+    // Check if this is a parameter node like 'par1' or 'par2'
     if (node->name && strncmp(node->name, "par", 3) == 0 && node->child_count >= 2) {
-        param_types[(*index)++] = get_type_from_name(node->children[1]->name);
-        printf("DEBUG: Extracted type %s at index %d\n", 
-               get_name_from_type(param_types[(*index)-1]), (*index)-1);
+        // Extract parameter number from name (par1 -> 1, par2 -> 2)
+        int param_num = atoi(node->name + 3) - 1;  // Convert to 0-based index
+        
+        char* type_name = node->children[0]->name;
+        printf("DEBUG: Found parameter node '%s' (index %d) with type '%s'\n", 
+               node->name, param_num, type_name);
+        
+        if (param_num >= 0 && param_num < MAX_PARAMS) {
+            param_types[param_num] = get_type_from_name(type_name);
+            printf("DEBUG: Set param_types[%d] = %s\n", 
+                   param_num, get_name_from_type(param_types[param_num]));
+        }
         return;
     }
     
-
+    // Handle recursive parameter lists (empty node with 2 children)
     if (strcmp(node->name, "") == 0 && node->child_count == 2) {
-
-        collect_param_types_recursive(node->children[0], param_types, index);
-        
-
-        AST* param_node = node->children[1];
-        if (param_node) {
-            if (strncmp(param_node->name, "par", 3) == 0 && param_node->child_count >= 2) {
-                param_types[(*index)++] = get_type_from_name(param_node->children[1]->name);
-                printf("DEBUG: Extracted type %s at index %d from right child\n", 
-                       get_name_from_type(param_types[(*index)-1]), (*index)-1);
-            }
-            else {
-                collect_param_types_recursive(param_node, param_types, index);
-            }
-        }
-    }
-
-    else if (node->child_count == 3) {
-        param_types[(*index)++] = get_type_from_name(node->children[1]->name);
-        printf("DEBUG: Extracted type %s at index %d from 3-child node\n", 
-               get_name_from_type(param_types[(*index)-1]), (*index)-1);
-    }
-
-    else {
-        for (int i = 0; i < node->child_count; i++) {
-            collect_param_types_recursive(node->children[i], param_types, index);
-        }
-    }
-}
-
-void collect_params_recursive(AST* node, DataType* param_types, int* index) {
-    if (!node || node->child_count < 2)
+        // Process both children
+        collect_param_types_recursive(node->children[0], param_types, depth + 1);
+        collect_param_types_recursive(node->children[1], param_types, depth + 1);
         return;
-
-    if (strcmp(node->name, "") == 0 && node->child_count >= 2) {
-        if (node->children[1] && node->children[1]->child_count >= 2) {
-            DataType type = get_type_from_name(node->children[1]->children[1]->name);
-            param_types[(*index)++] = type;
-            printf("DEBUG: Collected parameter type %s at index %d\n", 
-                  get_name_from_type(type), *index - 1);
-        }
-        
-        if (node->children[0]) {
-            collect_params_recursive(node->children[0], param_types, index);
-        }
-    } else if (node->child_count == 3) {
-        DataType type = get_type_from_name(node->children[1]->name);
-        param_types[(*index)++] = type;
-        printf("DEBUG: Collected parameter type %s at index %d\n", 
-              get_name_from_type(type), *index - 1);
+    }
+    
+    // Handle other structures by recursively processing children
+    for (int i = 0; i < node->child_count; i++) {
+        collect_param_types_recursive(node->children[i], param_types, depth + 1);
     }
 }
-
-
 DataType get_expr_type(AST* expr) {
     if (!expr)
         return DT_VOID;
@@ -642,17 +543,20 @@ void check_param_types(char* func_name, AST* args_node) {
     DataType actual_types[MAX_PARAMS];
     memset(actual_types, 0, sizeof(actual_types));
     
-    printf("DEBUG: Checking params for function '%s', expects %d params\n", func_name, param_count);
-for (int i = 0; i < param_count; i++) {
-    printf("DEBUG: Formal param %d: %s\n", i+1, get_name_from_type(func->param_types[i]));
-}
-
-get_call_param_types(args_node, actual_types);
-
-printf("DEBUG: Found %d actual params\n", count_actual_params(args_node));
-for (int i = 0; i < param_count; i++) {
-    printf("DEBUG: Actual param %d: %s\n", i+1, get_name_from_type(actual_types[i]));
-}    
+    printf("DEBUG: ===== CHECKING PARAMETER TYPES =====\n");
+    printf("DEBUG: Expected types for function '%s':\n", func_name);
+    for (int i = 0; i < param_count; i++) {
+        printf("DEBUG:   Formal param %d: %s\n", i+1, get_name_from_type(func->param_types[i]));
+    }
+    
+    get_call_param_types(args_node, actual_types);
+    
+    printf("DEBUG: Actual types from function call:\n");
+    for (int i = 0; i < param_count; i++) {
+        printf("DEBUG:   Actual param %d: %s\n", i+1, get_name_from_type(actual_types[i]));
+    }
+    printf("DEBUG: =====================================\n");
+        
     for (int i = 0; i < param_count; i++) {
         if (actual_types[i] != func->param_types[i]) {
             if (!(func->param_types[i] == DT_REAL && actual_types[i] == DT_INT)) {

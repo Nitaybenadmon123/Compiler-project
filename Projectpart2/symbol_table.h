@@ -51,7 +51,7 @@ void insert_function_with_param_types(char* name, DataType type, int param_count
 int count_params(AST* args_node);
 int count_actual_params(AST* args_node);
 void collect_param_types(AST* par_list, DataType* param_types);
-void collect_params_recursive(AST* node, DataType* param_types, int* index);
+void collect_param_types_recursive(AST* node, DataType* param_types, int depth);
 DataType get_expr_type(AST* expr);
 void check_param_types(char* func_name, AST* args_node);
 void get_call_param_types(AST* args_node, DataType* types);
@@ -67,9 +67,9 @@ int get_expected_param_number(const char* param_name);
 void check_param_order(const char* param_name, int expected_number);
 void add_multiple_variables(AST* id_list, DataType type);
 int count_params_helper(AST* node);
-void collect_param_types_recursive(AST* node, DataType* param_types, int* index);
 void add_multiple_variables_with_values(AST* list, DataType type);
 void insert_checked_variable_with_value(const char* name, DataType type, const char* value);
+void debug_param_ast(AST* node, int depth);  // <-- ADD THIS LINE
 
 
 

@@ -1,4 +1,4 @@
-def process(par1 int:num; par2 bool:flag): returns int
+def process(par1 bool:num; par2 int:flag): returns int
 begin
     if flag:
     begin
@@ -9,7 +9,7 @@ end
 
 def test_wrong_types(): returns int
 begin
-    return process(5, 5);  
+    return process(5,5);  
 end
 
 def _main_():
