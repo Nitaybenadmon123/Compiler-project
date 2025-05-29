@@ -46,8 +46,8 @@
 %token COLON SEMICOLON COMMA LPAREN RPAREN LBRACK RBRACK BAR TYPE
 
 %type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr id_list id_value_list 
-%type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call 
-%type <ast> literal
+%type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call block_content
+%type <ast> literal nested_block function_body nested_func_list
 
 %%
 
@@ -63,6 +63,21 @@ program:
 func_list:
     func_list function { $$ = make_node("CODE", 2, $1, $2); }
   | function { $$ = make_node("CODE", 1, $1); }
+;
+function_body:
+    T_BEGIN stmt_list T_END { $$ = make_node("BLOCK", 1, $2); }
+  | T_BEGIN nested_func_list stmt_list T_END { $$ = make_node("BLOCK", 2, $2, $3); }
+  | T_BEGIN T_END { $$ = make_node("BLOCK", 0); }
+   | VAR type_decls T_BEGIN stmt_list T_END { 
+        $$ = make_node("VAR_BLOCK", 2, $2, make_node("BLOCK", 1, $4)); 
+    }
+  | VAR type_decls T_BEGIN T_END { 
+        $$ = make_node("VAR_BLOCK", 2, $2, make_node("BLOCK", 0)); 
+    }
+;
+nested_func_list:
+    nested_func_list function { $$ = make_node("", 2, $1, $2); }
+  | function { $$ = $1; }
 ;
 function:
     DEF ID LPAREN par_list RPAREN COLON RETURNS type {
@@ -95,8 +110,10 @@ function:
         if (get_type_from_name($8->name) == DT_STRING) {
             yyerror("Semantic Error: Function cannot return string type");
         }
+          enter_scope();
+        printf("DEBUG: Entered function scope %d for function %s\n", current_scope, $2);
         //enter_scope();
-    } stmt_list {
+    } function_body {
          //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
@@ -106,6 +123,8 @@ function:
              $4,
              make_node("RET", 1, $8),
              make_node("BODY", 1, $10));
+              exit_scope();
+        printf("DEBUG: Exited function scope for function %s, back to scope %d\n", $2, current_scope);
     }
 
   | DEF ID LPAREN RPAREN COLON RETURNS type {
@@ -132,8 +151,10 @@ function:
         if (get_type_from_name($7->name) == DT_STRING) {
             yyerror("Semantic Error: Function cannot return string type");
         }
+          enter_scope();
+        printf("DEBUG: Entered function scope %d for function %s\n", current_scope, $2);
         //enter_scope();
-    } stmt_list {
+    } function_body {
          //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
@@ -143,6 +164,8 @@ function:
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, $7),
              make_node("BODY", 1, $9));
+                   exit_scope();
+        printf("DEBUG: Exited function scope for function %s, back to scope %d\n", $2, current_scope);
     }
 
   | DEF ID LPAREN par_list RPAREN COLON {
@@ -169,8 +192,10 @@ function:
             if ($4->child_count > 0 && strcmp($4->children[0]->name, "NONE") != 0)
                 yyerror("Semantic Error: _main_ function cannot take arguments");
         }
+          enter_scope();
+        printf("DEBUG: Entered function scope %d for function %s\n", current_scope, $2);
         //enter_scope();
-    } stmt_list {
+    } function_body {
          //exit_scope();
         inside_main = 0;
         current_function_name[0] = '\0';  
@@ -180,6 +205,8 @@ function:
              $4,
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $8));
+                   exit_scope();
+        printf("DEBUG: Exited function scope for function %s, back to scope %d\n", $2, current_scope);
     }
 
   | DEF ID LPAREN RPAREN COLON {
@@ -200,8 +227,10 @@ function:
             main_defined = 1;
             inside_main = 1;
         }
+          enter_scope();
+        printf("DEBUG: Entered function scope %d for function %s\n", current_scope, $2);
        // enter_scope();
-    } stmt_list {
+    } function_body {
         // exit_scope();
         inside_main = 0;
          current_function_name[0] = '\0';  
@@ -211,6 +240,8 @@ function:
              make_node("ARGS", 1, make_node("NONE", 0)),
              make_node("RET", 1, make_node("NONE", 0)),
              make_node("BODY", 1, $7));
+                    exit_scope();
+        printf("DEBUG: Exited function scope for function %s, back to scope %d\n", $2, current_scope);
 
     }
 ;
@@ -279,7 +310,6 @@ stmt:
   |var_stmt 
   |void_call
 |assignment_call
-|func_list
 ;
 
 assignment:
@@ -376,11 +406,31 @@ id_list:
 
 
 var_stmt:
-    VAR type_decls block {
-        $$ = make_node("VAR", 2, $2, $3);
+    VAR {
+        enter_scope();
+        printf("DEBUG: Entered VAR scope %d\n", current_scope);
+    } type_decls block_content {
+        $$ = make_node("VAR", 2, $3, $4);
     }
-  | VAR type_decls stmt {
-        $$ = make_node("VAR", 2, $2, $3);
+  | VAR {
+        enter_scope();
+        printf("DEBUG: Entered VAR scope %d\n", current_scope);
+    } type_decls stmt {
+        $$ = make_node("VAR", 2, $3, $4);
+        exit_scope();
+        printf("DEBUG: Exited VAR scope\n");
+    }
+;
+block_content:
+    T_BEGIN stmt_list T_END {
+        $$ = make_node("BLOCK", 1, $2); 
+        exit_scope();
+        printf("DEBUG: Exited VAR scope from block_content\n");
+    }
+    | T_BEGIN T_END {
+        $$ = make_node("BLOCK", 0); 
+        exit_scope();
+        printf("DEBUG: Exited VAR scope from empty block_content\n");
     }
 ;
 type_decls:
@@ -544,9 +594,6 @@ literal:
 return_stmt:
     RETURN expr SEMICOLON {
         printf("DEBUG: Processing return with value in function '%s'\n", current_function_name);
-        if (strcmp(current_function_name, "_main_") == 0) {
-    yyerror("Semantic Error: _main_ function cannot return a value");
-}
 
         
         check_return_type($2, current_function_name);
@@ -563,12 +610,12 @@ return_stmt:
 ;
 
 if_stmt:
-    IF expr COLON block ELSE COLON block
+    IF expr COLON nested_block ELSE COLON nested_block
     {
         check_boolean_condition($2, "if");
         $$ = make_node("IF-ELSE", 3, $2, $4, $7);
     }
-  | IF expr COLON block
+  | IF expr COLON nested_block
     {
         check_boolean_condition($2, "if");
         $$ = make_node("IF", 2, $2, $4);
@@ -583,7 +630,7 @@ if_stmt:
         check_boolean_condition($2, "if");
         $$ = make_node("IF-ELSE", 3, $2, $4, $7);
     }
-  | IF expr COLON block elif_list ELSE COLON block
+  | IF expr COLON nested_block elif_list ELSE COLON nested_block
     {
         check_boolean_condition($2, "if");
         $$ = make_node("IF-ELIF-ELSE", 4, $2, $4, $5, $8);
@@ -730,20 +777,30 @@ void_call:
 ;
 
 block:
+    T_BEGIN stmt_list T_END {
+        $$ = make_node("BLOCK", 1, $2); 
+    }
+    | T_BEGIN T_END {
+        $$ = make_node("BLOCK", 0); 
+    }
+;
+nested_block:
     T_BEGIN {
         enter_scope();
-    }
-    stmt_list T_END {
+        printf("DEBUG: Entered nested block scope %d\n", current_scope);
+    } stmt_list T_END {
         $$ = make_node("BLOCK", 1, $3); 
         exit_scope();
+        printf("DEBUG: Exited nested block scope\n");
     }
-    |    T_BEGIN {
+    | T_BEGIN {
         enter_scope();
-    }
-     T_END {
+        printf("DEBUG: Entered nested block scope %d\n", current_scope);
+    } T_END {
         $$ = make_node("BLOCK", 0); 
         exit_scope();
-     }
+        printf("DEBUG: Exited nested block scope\n");
+    }
 ;
 
 expr:

@@ -19,22 +19,13 @@ void enter_scope() {
 
     symbol_stack[current_scope] = malloc(sizeof(SymbolTable));
     symbol_stack[current_scope]->head = NULL;
-    printf("create new scope current_scope is: %d\n", current_scope);
+    printf("DEBUG: ENTERED scope %d (from scope %d)\n", current_scope, current_scope - 1);
 }
 
 void exit_scope() {
-    /*if (!preserve_symbol_tables) {
-        Symbol* s = symbol_stack[current_scope]->head;
-        while (s) {
-            Symbol* temp = s;
-            s = s->next;
-            free(temp->name);
-            free(temp);
-        }
-        */
+    printf("DEBUG: EXITING scope %d (back to scope %d)\n", current_scope, current_scope - 1);
     current_scope--;
 }
-
 void insert_symbol(char* name, SymbolKind kind, DataType type) {
     Symbol* new_sym = malloc(sizeof(Symbol));
     new_sym->name = strdup(name);
@@ -135,13 +126,28 @@ void print_symbol_tables() {
 }
 
 void insert_checked_variable(const char* name, DataType type) {
+    printf("DEBUG: Trying to insert variable '%s' in scope %d\n", name, current_scope);
+    
+    // Let's also see what's currently in this scope
+    printf("DEBUG: Current scope %d contents:\n", current_scope);
+    if (symbol_stack[current_scope] && symbol_stack[current_scope]->head) {
+        Symbol* s = symbol_stack[current_scope]->head;
+        while (s) {
+            printf("  - %s (%s)\n", s->name, s->kind == VAR_SYM ? "variable" : "function");
+            s = s->next;
+        }
+    } else {
+        printf("  (empty)\n");
+    }
+    
     if (symbol_exists_in_current_scope(name)) {
+        printf("DEBUG: Variable '%s' already exists in scope %d\n", name, current_scope);
         char error_msg[100];
         sprintf(error_msg, "Semantic Error: Var '%s' already defined in this block", name);
         yyerror(error_msg);
     } else {
         insert_symbol((char*)name, VAR_SYM, type);
-        printf("  Inserted '%s' as var in scope %d\n", name, current_scope);
+        printf("DEBUG: Successfully inserted '%s' as var in scope %d\n", name, current_scope);
     }
 }
 
@@ -869,6 +875,20 @@ void insert_checked_variable_with_value(const char* name, DataType type, const c
         new_sym->next = symbol_stack[current_scope]->head;
         symbol_stack[current_scope]->head = new_sym;
         printf("  Inserted '%s' with value '%s' as var in scope %d\n", name, value, current_scope);
+    }
+}
+void debug_param_ast(AST* node, int depth) {
+    if (!node) {
+        printf("DEBUG: %*s(null)\n", depth*2, "");
+        return;
+    }
+    
+    printf("DEBUG: %*sNode: '%s', children: %d\n", depth*2, "", 
+           node->name ? node->name : "(null)", node->child_count);
+    
+    for (int i = 0; i < node->child_count; i++) {
+        printf("DEBUG: %*s  Child %d:\n", depth*2, "", i);
+        debug_param_ast(node->children[i], depth + 1);
     }
 }
 
