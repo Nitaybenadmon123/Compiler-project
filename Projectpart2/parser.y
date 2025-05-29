@@ -248,7 +248,7 @@ function:
 
 par_list:
     param_list_item_list { $$ = make_node("ARGS", 1, $1); }
-  | /* empty */ { $$ = make_node("ARGS", 1, make_node("NONE", 0)); }
+  | { $$ = make_node("ARGS", 1, make_node("NONE", 0)); }
 ;
 
 param_list_item_list:
@@ -310,6 +310,7 @@ stmt:
   |var_stmt 
   |void_call
 |assignment_call
+|function
 ;
 
 assignment:
