@@ -57,7 +57,73 @@ Symbol* lookup_symbol(const char* name) {
     }
     return NULL;
 }
+void add_multiple_string_arrays(AST* string_list) {
+    if (!string_list) return;
 
+    // אם זה רשימה עם שני ילדים (רקורסיה)
+    if (string_list->name && strcmp(string_list->name, "") == 0 && string_list->child_count == 2) {
+        // עבד על הרשימה הקודמת
+        add_multiple_string_arrays(string_list->children[0]);
+        
+        // עבד על האלמנט הנוכחי
+        AST* current = string_list->children[1];
+        if (current && current->name && current->child_count == 1) {
+            int size = atoi(current->children[0]->name);
+            if (size <= 0) {
+                char error_msg[100];
+                sprintf(error_msg, "Semantic Error: String size must be positive for '%s'", current->name);
+                yyerror(error_msg);
+            }
+            insert_checked_variable(current->name, DT_STRING);
+        }
+    }
+    // אלמנט יחיד
+    else if (string_list->name && string_list->child_count == 1) {
+        int size = atoi(string_list->children[0]->name);
+        if (size <= 0) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: String size must be positive for '%s'", string_list->name);
+            yyerror(error_msg);
+        }
+        insert_checked_variable(string_list->name, DT_STRING);
+    }
+}
+void add_multiple_variables_mixed(AST* list, DataType type) {
+    if (!list) return;
+
+    // אם זה רשימה עם שני ילדים (רקורסיה)
+    if (list->name && strcmp(list->name, "") == 0 && list->child_count == 2) {
+        // עבד על הרשימה הקודמת
+        add_multiple_variables_mixed(list->children[0], type);
+        
+        // עבד על האלמנט הנוכחי
+        AST* current = list->children[1];
+        if (current && current->name) {
+            // בדוק אם יש ערך התחלה
+            if (current->child_count == 1) {
+                // משתנה עם ערך התחלה
+                const char* name = current->name;
+                const char* value = current->children[0]->name;
+                insert_checked_variable_with_value(name, type, value);
+            } else {
+                // משתנה ללא ערך התחלה
+                insert_checked_variable(current->name, type);
+            }
+        }
+    }
+    // אלמנט יחיד
+    else if (list->name) {
+        if (list->child_count == 1) {
+            // משתנה עם ערך התחלה
+            const char* name = list->name;
+            const char* value = list->children[0]->name;
+            insert_checked_variable_with_value(name, type, value);
+        } else {
+            // משתנה ללא ערך התחלה
+            insert_checked_variable(list->name, type);
+        }
+    }
+}
 DataType get_type_from_name(const char* type_str) {
     if (strcmp(type_str, "int") == 0) return DT_INT;
     if (strcmp(type_str, "real") == 0) return DT_REAL;
@@ -212,7 +278,7 @@ int count_params(AST* args_node) {
                 count++;
             }
             
-            printf("DEBUG: Recursive list structure detected with %d parameters\n", count);
+            
             return count;
         }
    
@@ -423,7 +489,9 @@ DataType get_expr_type(AST* expr) {
     if (expr->name && strcmp(expr->name, "array_access") == 0) {
         return DT_CHAR;
     }
-
+    if (expr->name && strcmp(expr->name, "string_length") == 0) {
+        return DT_INT;  // אורך מחרוזת תמיד מחזיר int
+    }
     // ליטרלים
     if (expr->name && expr->name[0] == '\'') return DT_CHAR;
     if (expr->name && expr->name[0] == '"') return DT_STRING;

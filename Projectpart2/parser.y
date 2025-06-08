@@ -31,8 +31,9 @@
 %left OR
 %left AND
 %left PLUS MINUS
-%left MULT DIV
+
 %left EQ NE GT GE LT LE
+%left MULT DIV
 %right NOT
 
 %token <sval> ID CHAR_LITERAL STRING_LITERAL NUM TRUE FALSE
@@ -48,7 +49,7 @@
 
 %type <ast> program function func_list par_list par_list_item param_list_item_list elif_list call_list type_decls type_decl update_expr id_list id_value_list 
 %type <ast> type stmt_list stmt assignment expr if_stmt block return_stmt while_stmt for_stmt   do_while_stmt var_stmt call_args void_call assignment_call block_content
-%type <ast> literal nested_block function_body nested_func_list
+%type <ast> literal nested_block function_body nested_func_list string_id_list mixed_id_list
 
 %%
 
@@ -401,7 +402,20 @@ assignment:
         $$ = make_node("error", 2, make_node("&", 1, make_node($2, 0)), $4);
    }
 ;
-
+mixed_id_list:
+    ID {
+        $$ = make_node($1, 0);  /* משתנה ללא ערך התחלה */
+    }
+    | ID COLON literal {
+        $$ = make_node($1, 1, $3);  /* משתנה עם ערך התחלה */
+    }
+    | mixed_id_list COMMA ID {
+        $$ = make_node("", 2, $1, make_node($3, 0));  /* הוספת משתנה ללא ערך */
+    }
+    | mixed_id_list COMMA ID COLON literal {
+        $$ = make_node("", 2, $1, make_node($3, 1, $5));  /* הוספת משתנה עם ערך */
+    }
+;
 id_list:
       ID                        { $$ = make_node($1, 0); }
     | id_list COMMA ID         { $$ = make_node("", 2, $1, make_node($3, 0)); }
@@ -442,6 +456,14 @@ type_decls:
     }
   | type_decl {
         $$ = $1;
+    }
+;
+string_id_list:
+    ID LBRACK NUM RBRACK {
+        $$ = make_node($1, 1, make_node($3, 0));
+    }
+    | string_id_list COMMA ID LBRACK NUM RBRACK {
+        $$ = make_node("", 2, $1, make_node($3, 1, make_node($5, 0)));
     }
 ;
 type_decl:
@@ -540,18 +562,9 @@ type_decl:
         add_multiple_variables($4, DT_PTR_REAL);
         $$ = make_node("TYPE_MULTI", 2, make_node("real*", 0), $4);
     }
-    | TYPE TYPE_STRING id_list LBRACK NUM RBRACK SEMICOLON {
-        int size = atoi($5);
-        if (size <= 0) {
-           yyerror("Semantic Error: String size must be a positive integer");
-       }
-        /* רישום משתנים */
-        add_multiple_variables($3, DT_STRING);
-        /* יצירת AST: שם הצומת, מספר ילדים, טיפוס, רשימת מזהים, גודל */
-        $$ = make_node("TYPE_STRING_ARRAY", 3,
-                      make_node("string", 0),
-                       $3,
-                       make_node($5, 0));
+| TYPE TYPE_STRING COLON string_id_list SEMICOLON {
+        add_multiple_string_arrays($4);
+        $$ = make_node("TYPE_STRING_MULTI", 2, make_node("string", 0), $4);
     }
 | TYPE TYPE_BOOL COLON id_value_list SEMICOLON {
     add_multiple_variables_with_values($4, DT_BOOL);
@@ -572,7 +585,26 @@ type_decl:
 | TYPE TYPE_REAL COLON id_value_list SEMICOLON {
     add_multiple_variables_with_values($4, DT_REAL);
     $$ = make_node("TYPE_MULTI_INIT", 2, make_node("real", 0), $4);
-}
+}| TYPE TYPE_BOOL COLON mixed_id_list SEMICOLON {
+        add_multiple_variables_mixed($4, DT_BOOL);
+        $$ = make_node("TYPE_MIXED", 2, make_node("bool", 0), $4);
+    }
+  | TYPE TYPE_INT COLON mixed_id_list SEMICOLON {
+        add_multiple_variables_mixed($4, DT_INT);
+        $$ = make_node("TYPE_MIXED", 2, make_node("int", 0), $4);
+    }
+  | TYPE TYPE_CHAR COLON mixed_id_list SEMICOLON {
+        add_multiple_variables_mixed($4, DT_CHAR);
+        $$ = make_node("TYPE_MIXED", 2, make_node("char", 0), $4);
+    }
+  | TYPE TYPE_STRING COLON mixed_id_list SEMICOLON {
+        add_multiple_variables_mixed($4, DT_STRING);
+        $$ = make_node("TYPE_MIXED", 2, make_node("string", 0), $4);
+    }
+  | TYPE TYPE_REAL COLON mixed_id_list SEMICOLON {
+        add_multiple_variables_mixed($4, DT_REAL);
+        $$ = make_node("TYPE_MIXED", 2, make_node("real", 0), $4);
+    }
 
 ;
 id_value_list:
@@ -807,6 +839,20 @@ nested_block:
 ;
 
 expr:
+| BAR ID BAR {
+        Symbol* sym = lookup_any_scope($2);
+        if (!sym) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Variable '%s' used before declaration", $2);
+            yyerror(error_msg);
+        } else if (sym->type != DT_STRING) {
+            char error_msg[100];
+            sprintf(error_msg, "Semantic Error: Length operator |...| can only be used with string type, '%s' is of type %s", 
+                    $2, get_name_from_type(sym->type));
+            yyerror(error_msg);
+        }
+        $$ = make_node("string_length", 1, make_node($2, 0));
+    }|
     expr PLUS expr {
     DataType left = get_expr_type($1);
     DataType right = get_expr_type($3);

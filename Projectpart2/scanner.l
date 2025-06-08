@@ -11,8 +11,8 @@ ID [a-zA-Z_][a-zA-Z0-9_]*
 CHAR_LIT \'(\\.|[^\\'])\'
 STRING_LIT \"(\\\\.|[^\\\"])*\"
 HEX_NUM 0[xX][0-9a-fA-F]+
-REAL_NUM [-+]?([0-9]*[.])?[0-9]+([eE][-+]?[0-9]+)?
-INT_NUM [1-9][0-9]*|0
+REAL_NUM ([0-9]*[.])?[0-9]+([eE][-+]?[0-9]+)?
+INT_NUM [0-9]+
 
 %%
 "#->"([^<]|\n)*"<-#"    { /* ignore comment */ }
@@ -39,24 +39,14 @@ INT_NUM [1-9][0-9]*|0
 "returns"    {  return RETURNS; }
 "type"         {return TYPE;}
 
+"int"[ \t]*"*"       { yylval.sval = strdup("int*"); return TYPE_INT_PTR; }
+"char"[ \t]*"*"      { yylval.sval = strdup("char*"); return TYPE_CHAR_PTR; }
+"real"[ \t]*"*"      { yylval.sval = strdup("real*"); return TYPE_REAL_PTR; }
 "int"        { yylval.sval = strdup(yytext); return TYPE_INT; }
 "real"       {  yylval.sval = strdup(yytext); return TYPE_REAL; }
 "char"       { yylval.sval = strdup(yytext); return TYPE_CHAR; }
 "bool"       {  yylval.sval = strdup(yytext); return TYPE_BOOL; }
 "string"     { yylval.sval = strdup(yytext); return TYPE_STRING; }
-"int"[ \t]*"*"       { yylval.sval = strdup("int*"); return TYPE_INT_PTR; }
-"char"[ \t]*"*"      { yylval.sval = strdup("char*"); return TYPE_CHAR_PTR; }
-"real"[ \t]*"*"      { yylval.sval = strdup("real*"); return TYPE_REAL_PTR; }
-
-
-":"          {return COLON; }
-";"          {  return SEMICOLON; }
-","          { return COMMA; }
-"("          {  return LPAREN; }
-")"          { return RPAREN; }
-"["          { return LBRACK; }
-"]"          { return RBRACK; }
-"|"          { return BAR; }
 
 "=="         { return EQ; }
 "!="         { return NE; }
@@ -70,6 +60,15 @@ INT_NUM [1-9][0-9]*|0
 "*"          { return MULT; }
 "/"          { return DIV; }
 "&"          { return ADDRESS; }
+
+":"          {return COLON; }
+";"          {  return SEMICOLON; }
+","          { return COMMA; }
+"("          {  return LPAREN; }
+")"          { return RPAREN; }
+"["          { return LBRACK; }
+"]"          { return RBRACK; }
+"|"          { return BAR; }
 
 {CHAR_LIT}       {  yylval.sval = strdup(yytext); return CHAR_LITERAL; }
 {STRING_LIT}     { yylval.sval = strdup(yytext); return STRING_LITERAL; }

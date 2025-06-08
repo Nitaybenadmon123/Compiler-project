@@ -70,7 +70,8 @@ int count_params_helper(AST* node);
 void add_multiple_variables_with_values(AST* list, DataType type);
 void insert_checked_variable_with_value(const char* name, DataType type, const char* value);
 void debug_param_ast(AST* node, int depth);  // <-- ADD THIS LINE
-
+void add_multiple_string_arrays(AST* string_list);
+void add_multiple_variables_mixed(AST* list, DataType type);
 
 
 
