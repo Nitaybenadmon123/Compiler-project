@@ -1,33 +1,19 @@
-def process_data(par1 real:input; par2 string:text): returns string 
+def main() : returns int
 var
-    type int: i;
-    type real: computed;
-    type char*: ptr;
+      type string:  s1[100];
+    type string: s2[100];
+      type  int: i:0, j:0, cnt:0;
 begin
-    for (i = 0; i < 10; i = i + 1):
-    begin
-        computed = input + i;
-        if computed > 0.0:
-        begin
-            var
-                type bool: flag;
-            begin
-                flag = computed > 5.0; 
-                ptr = &text[i];
-                if flag and (computed > 5.0):
-                begin
-                    return text;
-                end
-            end
+     cnt= 1;
+     while i < s1:  begin
+        while  j < s2 / 2 : begin
+           #->19 if s1[i]  =  s2[j] :  <-#
+           begin
+               cnt=cnt*2;
+           end
+           j= j + 1;
         end
-    end
-    return "default";
-end
-
-def _main_():
-var
-    type int: final_result;
-    type string: result;
-begin
-    result = process_data(2.5, "test");
+        i= i + 1;
+     end
+     return cnt;
 end

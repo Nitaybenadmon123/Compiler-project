@@ -180,12 +180,11 @@ int count_params(AST* args_node) {
     if (!list || strcmp(list->name, "NONE") == 0)
         return 0;
     
-    printf("DEBUG: Parameter list node name: '%s', child_count: %d\n", 
-           list->name ? list->name : "(null)", list->child_count);
+    //printf("DEBUG: Parameter list node name: '%s', child_count: %d\n", list->name ? list->name : "(null)", list->child_count);
     
 
     if (list->name && strncmp(list->name, "par", 3) == 0) {
-        printf("DEBUG: Single parameter case detected: %s\n", list->name);
+        //printf("DEBUG: Single parameter case detected: %s\n", list->name);
         return 1;
     }
 
@@ -398,139 +397,112 @@ DataType get_expr_type(AST* expr) {
     if (!expr)
         return DT_VOID;
 
-
+    // כתובת של משתנה
     if (expr->name && strcmp(expr->name, "&") == 0 && expr->child_count == 1) {
         DataType operand_type = get_expr_type(expr->children[0]);
-        
-        if (operand_type == DT_INT) return DT_PTR_INT;
-        if (operand_type == DT_CHAR) return DT_PTR_CHAR;
-        if (operand_type == DT_REAL) return DT_PTR_REAL;
-        return DT_VOID; 
-    }
-    
-    if (expr->name && strcmp(expr->name, "*") == 0 && expr->child_count == 1) {
-        DataType operand_type = get_expr_type(expr->children[0]);
-        
-        if (operand_type == DT_PTR_INT) return DT_INT;
-        if (operand_type == DT_PTR_CHAR) return DT_CHAR;
-        if (operand_type == DT_PTR_REAL) return DT_REAL;
-        return DT_VOID; 
-    }
-    
-    if (expr->name && strcmp(expr->name, "&") == 0 && expr->child_count == 1) {
-        DataType operand_type = get_expr_type(expr->children[0]);
-        
         switch (operand_type) {
             case DT_INT: return DT_PTR_INT;
             case DT_CHAR: return DT_PTR_CHAR;
             case DT_REAL: return DT_PTR_REAL;
-            default: return DT_VOID; 
+            default: return DT_VOID;
         }
     }
-    
+
+    // dereference של מצביע
     if (expr->name && strcmp(expr->name, "*") == 0 && expr->child_count == 1) {
         DataType operand_type = get_expr_type(expr->children[0]);
-        
         switch (operand_type) {
             case DT_PTR_INT: return DT_INT;
             case DT_PTR_CHAR: return DT_CHAR;
             case DT_PTR_REAL: return DT_REAL;
-            default: return DT_VOID; 
+            default: return DT_VOID;
         }
     }
-    
+
+    // גישה לתא במחרוזת
     if (expr->name && strcmp(expr->name, "array_access") == 0) {
-        return DT_CHAR;  
-    }
-    
-    if (expr->name && expr->name[0] == '\'')
         return DT_CHAR;
-    
-    if (expr->name && expr->name[0] == '"')
-        return DT_STRING;
-    
-        if (expr->name && (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0 ||
+    }
+
+    // ליטרלים
+    if (expr->name && expr->name[0] == '\'') return DT_CHAR;
+    if (expr->name && expr->name[0] == '"') return DT_STRING;
+
+    // ערכים בוליאניים
+    if (expr->name && (
+        strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0 ||
         strcmp(expr->name, "TRUE") == 0 || strcmp(expr->name, "FALSE") == 0))
         return DT_BOOL;
-    
-    if (expr->name && (strcmp(expr->name, "true") == 0 || strcmp(expr->name, "false") == 0))
-        return DT_BOOL;
-    
+
+    // nullptr
     if (expr->name && strcmp(expr->name, "nullptr") == 0)
-        return DT_PTR_INT; // or any pointer type
-    
-    if (expr->name) {
-        if (strcmp(expr->name, "and") == 0 ||
-            strcmp(expr->name, "or") == 0 ||
-            strcmp(expr->name, "not") == 0)
-            return DT_BOOL;
-        
-        if (strcmp(expr->name, "==") == 0 ||
-            strcmp(expr->name, "!=") == 0 ||
-            strcmp(expr->name, "<") == 0 ||
-            strcmp(expr->name, ">") == 0 ||
-            strcmp(expr->name, "<=") == 0 ||
-            strcmp(expr->name, ">=") == 0)
-            return DT_BOOL;
+        return DT_PTR_INT;
+
+    // ביטויים בוליאניים
+    if (expr->name && (
+        strcmp(expr->name, "and") == 0 || strcmp(expr->name, "or") == 0 || strcmp(expr->name, "not") == 0 ||
+        strcmp(expr->name, "==") == 0 || strcmp(expr->name, "!=") == 0 ||
+        strcmp(expr->name, "<") == 0 || strcmp(expr->name, ">") == 0 ||
+        strcmp(expr->name, "<=") == 0 || strcmp(expr->name, ">=") == 0))
+        return DT_BOOL;
+
+    // קריאה לפונקציה
+    if (expr->name && strcmp(expr->name, "call") == 0 && expr->child_count >= 1) {
+        AST* func_node = expr->children[0];  // שם הפונקציה
+        if (func_node && func_node->name) {
+            Symbol* sym = lookup_symbol(func_node->name);
+            if (sym) return sym->type;
+            yyerror("Semantic Error: Function in call not found in symbol table");
+            return DT_VOID;
+        }
     }
-    
+
+    // אם זה מזהה (שם של משתנה או קבוע)
     if (expr->name) {
         Symbol* sym = lookup_any_scope(expr->name);
         if (sym)
             return sym->type;
     }
-    
-    if (expr->child_count > 0) {
-        if (expr->name) {
-            if (strcmp(expr->name, "and") == 0 ||
-                strcmp(expr->name, "or") == 0 ||
-                strcmp(expr->name, "not") == 0 ||
-                strcmp(expr->name, "==") == 0 ||
-                strcmp(expr->name, "!=") == 0 ||
-                strcmp(expr->name, "<") == 0 ||
-                strcmp(expr->name, ">") == 0 ||
-                strcmp(expr->name, "<=") == 0 ||
-                strcmp(expr->name, ">=") == 0)
-                return DT_BOOL;
-        }
-        
-        if (expr->name && (strcmp(expr->name, "+") == 0 ||
-                          strcmp(expr->name, "-") == 0 ||
-                          strcmp(expr->name, "*") == 0 ||
-                          strcmp(expr->name, "/") == 0)) {
+
+    // ביטויים אריתמטיים
+    if (expr->child_count > 0 && expr->name) {
+        if (strcmp(expr->name, "+") == 0 || strcmp(expr->name, "-") == 0 ||
+            strcmp(expr->name, "*") == 0 || strcmp(expr->name, "/") == 0) {
+
             DataType left = get_expr_type(expr->children[0]);
             DataType right = expr->child_count > 1 ? get_expr_type(expr->children[1]) : DT_VOID;
-            
+
             if (left == DT_REAL || right == DT_REAL)
                 return DT_REAL;
-            
+
             if (left == DT_INT && right == DT_INT)
                 return DT_INT;
         }
     }
-    if (expr->name) {
-     
-        if (isdigit(expr->name[0]) || (expr->name[0] == '-' && expr->name[1] && isdigit(expr->name[1]))) {
-           
-            for (int i = 0; expr->name[i]; i++) {
-                if (expr->name[i] == '.') {
-                    return DT_REAL;
-                }
-            }
-            return DT_INT;  
+
+    // ליטרלים מספריים
+    if (expr->name && (isdigit(expr->name[0]) || (expr->name[0] == '-' && isdigit(expr->name[1])))) {
+        for (int i = 0; expr->name[i]; i++) {
+            if (expr->name[i] == '.')
+                return DT_REAL;
         }
+        return DT_INT;
     }
 
-if (expr->name && strcmp(expr->name, "&array_access") == 0 && expr->child_count == 2) {
-    Symbol* sym = lookup_any_scope(expr->children[0]->name);
-    if (sym && sym->type == DT_STRING) {
-        return DT_PTR_CHAR; 
+    // כתובת של תא במחרוזת
+    if (expr->name && strcmp(expr->name, "&array_access") == 0 && expr->child_count == 2) {
+        Symbol* sym = lookup_any_scope(expr->children[0]->name);
+        if (sym && sym->type == DT_STRING)
+            return DT_PTR_CHAR;
+        return DT_VOID;
     }
-    return DT_VOID; 
-}
-    
+
+    // ברירת מחדל סופית – לא אידאלית, אך בטוחה
     return DT_INT;
 }
+
+
+
 void check_param_types(char* func_name, AST* args_node) {
     Symbol* func = lookup_any_scope(func_name);
     if (!func || func->kind != FUNC_SYM)

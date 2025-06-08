@@ -4,7 +4,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include "symbol_table.h"
-
+#include "three_address_code.h"
     AST* make_node(char* name, int count, ...);
     void print_ast(AST* node, int indent);
     void yyerror(const char* s);
@@ -19,6 +19,7 @@
     extern int preserve_symbol_tables;
     char current_function_name[256] = "";
     int current_param_index = 0;
+    AST* program_ast = NULL;
 %}
 
 %union {
@@ -53,6 +54,7 @@
 
 program:
     func_list {
+         program_ast = $1;
         print_ast($1, 0);
     }
   | error {
@@ -248,7 +250,7 @@ function:
 
 par_list:
     param_list_item_list { $$ = make_node("ARGS", 1, $1); }
-  | { $$ = make_node("ARGS", 1, make_node("NONE", 0)); }
+  | /* empty */ { $$ = make_node("ARGS", 1, make_node("NONE", 0)); }
 ;
 
 param_list_item_list:
@@ -1096,8 +1098,19 @@ int main(int argc, char* argv[]) {
     preserve_symbol_tables = 1;
     exit_scope();
 
-    if (!main_defined) {
+    // בדוק אם יש _main_ רק אם הפרסינג הצליח
+    if (result == 0 && !main_defined) {
         yyerror("Semantic Error: No _main_ function defined");
+    }
+
+    // גנרט קוד 3AC תמיד אם הפרסינג הצליח (ללא תלות ב-main)
+    if (result == 0 && program_ast) {
+        printf("\n=== THREE ADDRESS CODE ===\n");
+        generate_tac_from_ast(program_ast);
+    } else if (result != 0) {
+        printf("Parsing failed, cannot generate 3AC\n");
+    } else if (!program_ast) {
+        printf("No AST available for 3AC generation\n");
     }
 
     return result;

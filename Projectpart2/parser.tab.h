@@ -114,7 +114,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 25 "parser.y"
 
     struct ast_node* ast ;
     char* sval;
